@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HSK 1–2 Flashcards (Offline)</title>
+  <meta name="theme-color" content="#0f172a">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon-512.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="HSK Flashcards">
+  <link rel="apple-touch-icon" href="icon-512.png">
+  <style>
+    :root{--bg:#0f172a;--panel:#111827;--muted:#94a3b8;--text:#e5e7eb;--btn:#1f2937;--card:#0b1220;--shadow:0 6px 24px rgba(0,0,0,.35);--radius:14px;}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial;background:radial-gradient(1200px 800px at 70% -10%,#1e293b 0%,var(--bg) 60%);color:var(--text)}
+    header{padding:20px 16px 8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+    header h1{margin:0;font-size:20px}
+    .sub{color:var(--muted);font-size:13px}
+    main{max-width:980px;margin:0 auto;padding:16px}
+    .grid{display:grid;gap:16px;grid-template-columns:1fr}
+    @media(min-width:920px){.grid{grid-template-columns:1.2fr .8fr}}
+    .panel{background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,0));border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .section{padding:16px 18px} .section h2{margin:0 0 8px;font-size:16px}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    input[type=file],select,button,input[type=number],.pill{background:var(--btn);color:var(--text);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:10px 12px;font-size:14px}
+    input[type=number]{width:90px}
+    button{cursor:pointer;transition:.15s transform,.15s background} button:hover{transform:translateY(-1px)}
+    button.primary{background:linear-gradient(180deg,#16a34a,#17863f);border-color:#107a37}
+    button.secondary{background:#1e293b} button.warn{background:#3b2f0b;border-color:#4d3a0b;color:#facc15} button.ghost{background:transparent;border-color:rgba(255,255,255,.12);color:var(--muted)}
+    textarea{width:100%;min-height:120px;resize:vertical;background:#0b1020;color:var(--text);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:10px 12px;font-size:13px;font-family:ui-monospace,Menlo,Consolas,monospace}
+    .card{margin:18px;border-radius:var(--radius);background:linear-gradient(180deg,#0b1220,#0a1020);min-height:220px;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;border:1px solid rgba(255,255,255,.08)}
+    .big{font-size:40px;line-height:1.15} .small{font-size:17px;color:var(--muted);margin-top:8px} .meta{font-size:13px;color:var(--muted);margin-top:8px}
+    .controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:0 18px 18px}
+    .stats{display:flex;gap:12px;flex-wrap:wrap;margin:0 18px 18px;color:var(--muted);font-size:13px}
+    .pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;font-size:12px}
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>HSK 1–2 Flashcards <span class="sub">— offline, preloaded</span></h1>
+      <div class="sub">Tap “Load Preloaded HSK” to start. You can also paste or import your own CSV/TSV.</div>
+    </div>
+    <div class="row">
+      <span class="pill"><b>Flip</b>: <span id="modeLabel">Hanzi → English</span></span>
+      <span class="pill">Cards/Session: <span id="sessLabel">15</span></span>
+      <span class="pill">Queue: <span id="queueCount">0</span></span>
+    </div>
+  </header>
+
+  <main class="grid">
+    <section class="panel">
+      <div class="section">
+        <h2>Deck & Options</h2>
+        <div class="row" style="margin-bottom:6px">
+          <button class="primary" id="loadHSK">Load Preloaded HSK 1–2</button>
+          <div class="pill">~200+ core words</div>
+        </div>
+        <div class="row">
+          <label>Or load a file</label>
+          <input id="file" type="file" accept=".csv,.tsv,.txt">
+        </div>
+        <div class="row" style="margin-top:8px">
+          <label>Or paste list (headers: <code>hanzi,pinyin,english,level</code>)</label>
+        </div>
+        <textarea id="paste" placeholder="hanzi,pinyin,english,level&#10;你好,ni3 hao3,hello,HSK1"></textarea>
+        <div class="row" style="margin-top:8px">
+          <button class="secondary" id="usePasted">Use Pasted Deck</button>
+          <button class="ghost" id="clearPasted">Clear</button>
+          <div style="flex:1"></div>
+          <label>Flip</label>
+          <select id="mode">
+            <option value="hz2en">Hanzi → English (default)</option>
+            <option value="en2hz">English → Hanzi</option>
+            <option value="hz2py">Hanzi → Pinyin</option>
+            <option value="py2hz">Pinyin → Hanzi</option>
+          </select>
+          <label>Cards / session</label>
+          <input id="sess" type="number" min="5" max="100" step="1" value="15">
+          <button class="secondary" id="start">Start Session</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="card" id="card">
+        <div>
+          <div class="big" id="front">Load Preloaded HSK or add a deck</div>
+          <div class="small" id="back" style="display:none"></div>
+          <div class="meta" id="meta"></div>
+        </div>
+      </div>
+      <div class="controls">
+        <button id="btnFlip">Flip (F)</button>
+        <button class="secondary" id="btnNext">Next (Space/N)</button>
+        <button class="primary" id="btnGot">Got it (G)</button>
+        <button class="warn" id="btnMiss">Missed (M)</button>
+      </div>
+      <div class="stats">
+        <div>Seen: <b id="seen">0</b></div>
+        <div style="color:#22c55e">Correct: <b id="correct">0</b></div>
+        <div style="color:#f87171">Missed: <b id="missed">0</b></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function(){ navigator.serviceWorker.register('./sw.js').catch(function(){}); });
+    }
+  </script>
+  <script>
+    var deck = [], queue = [], ptr=0, flipped=false;
+    var stats = {seen:0, correct:0, missed:0};
+    var mode = localStorage.getItem('mode') || 'hz2en';
+    var sessSize = parseInt(localStorage.getItem('sessSize')||'15',10);
+    var frontEl = document.getElementById('front'), backEl=document.getElementById('back'), metaEl=document.getElementById('meta');
+
+    var preloaded = "hanzi	pinyin	english	level
+你好	ni3 hao3	hello	HSK1
+谢谢	xie4 xie	thanks	HSK1
+请	qing3	please	HSK1
+对不起	dui4 bu4 qi3	sorry	HSK1
+没关系	mei2 guan1 xi	no problem	HSK1
+再见	zai4 jian4	goodbye	HSK1
+是	shi4	to be	HSK1
+不是	bu2 shi4	not be	HSK1
+要	yao4	to want	HSK1
+不要	bu2 yao4	don't want	HSK1
+有	you3	to have	HSK1
+没有	mei2 you3	don't have	HSK1
+吃	chi1	to eat	HSK1
+喝	he1	to drink	HSK1
+水	shui3	water	HSK1
+米饭	mi3 fan4	rice	HSK1
+多少	duo1 shao3	how much/many	HSK1
+这	zhe4	this	HSK1
+那	na4	that	HSK1
+哪里	na3 li3	where	HSK1
+一	yi1	one	HSK1
+二	er4	two	HSK1
+三	san1	three	HSK1
+四	si4	four	HSK1
+五	wu3	five	HSK1
+六	liu4	six	HSK1
+七	qi1	seven	HSK1
+八	ba1	eight	HSK1
+九	jiu3	nine	HSK1
+十	shi2	ten	HSK1
+今天	jin1 tian1	today	HSK1
+昨天	zuo2 tian1	yesterday	HSK1
+明天	ming2 tian1	tomorrow	HSK1
+现在	xian4 zai4	now	HSK1
+点	dian3	o'clock	HSK1
+分钟	fen1 zhong1	minute	HSK1
+晚上	wan3 shang4	evening	HSK1
+星期	xing1 qi1	week	HSK1
+名字	ming2 zi	name	HSK1
+朋友	peng2 you	friend	HSK1
+家	jia1	home/family	HSK1
+爸爸	ba4 ba	father	HSK1
+妈妈	ma1 ma	mother	HSK1
+老师	lao3 shi1	teacher	HSK1
+学生	xue2 sheng1	student	HSK1
+医生	yi1 sheng1	doctor	HSK1
+喜欢	xi3 huan1	to like	HSK1
+想	xiang3	to want/think	HSK1
+会	hui4	can/know how	HSK1
+可以	ke3 yi3	may/can	HSK1
+去	qu4	to go	HSK1
+来	lai2	to come	HSK1
+住	zhu4	to live	HSK1
+坐	zuo4	to sit	HSK1
+走	zou3	to walk	HSK1
+看	kan4	to look/read	HSK1
+听	ting1	to listen	HSK1
+说话	shuo1 hua4	to speak	HSK1
+问	wen4	to ask	HSK1
+认识	ren4 shi	to know (someone)	HSK1
+知道	zhi1 dao4	to know	HSK1
+工作	gong1 zuo4	work	HSK1
+学习	xue2 xi2	study	HSK1
+天气	tian1 qi4	weather	HSK1
+冷	leng3	cold	HSK1
+热	re4	hot	HSK1
+高兴	gao1 xing4	happy	HSK1
+漂亮	piao4 liang	pretty	HSK1
+大	da4	big	HSK1
+小	xiao3	small	HSK1
+多	duo1	many	HSK1
+少	shao3	few	HSK1
+新	xin1	new	HSK1
+旧	jiu4	old	HSK2
+贵	gui4	expensive	HSK2
+便宜	pian2 yi2	cheap	HSK2
+快	kuai4	fast	HSK2
+慢	man4	slow	HSK2
+颜色	yan2 se4	color	HSK2
+白	bai2	white	HSK1
+黑	hei1	black	HSK1
+红	hong2	red	HSK2
+蓝	lan2	blue	HSK2
+黄	huang2	yellow	HSK2
+苹果	ping2 guo3	apple	HSK1
+面条	mian4 tiao2	noodles	HSK1
+菜	cai4	vegetable/dish	HSK1
+鸡蛋	ji1 dan4	egg	HSK1
+牛奶	niu2 nai3	milk	HSK1
+茶	cha2	tea	HSK1
+咖啡	ka1 fei1	coffee	HSK2
+钱	qian2	money	HSK1
+商店	shang1 dian4	shop	HSK1
+饭店	fan4 dian4	restaurant/hotel	HSK1
+医院	yi1 yuan4	hospital	HSK1
+学校	xue2 xiao4	school	HSK1
+公司	gong1 si1	company	HSK2
+银行	yin2 hang2	bank	HSK2
+桌子	zhuo1 zi	table	HSK1
+椅子	yi3 zi	chair	HSK1
+电脑	dian4 nao3	computer	HSK1
+手机	shou3 ji1	mobile phone	HSK1
+电视	dian4 shi4	TV	HSK1
+电影	dian4 ying3	movie	HSK1
+书	shu1	book	HSK1
+汉语	han4 yu3	Chinese (language)	HSK1
+中文	zhong1 wen2	Chinese (written)	HSK2
+衣服	yi1 fu	clothes	HSK1
+猫	mao1	cat	HSK1
+狗	gou3	dog	HSK1
+再	zai4	again (future)	HSK1
+可以吗	ke3 yi3 ma	OK?	HSK1
+没问题	mei2 wen4 ti2	no problem	HSK2
+因为	yin1 wei4	because	HSK2
+所以	suo3 yi3	therefore	HSK2
+但是	dan4 shi4	but	HSK2
+或者	huo4 zhe3	or (statement)	HSK2
+还是	hai2 shi4	or (question)	HSK2
+已经	yi3 jing1	already	HSK2
+正在	zheng4 zai4	in the middle of	HSK2
+一起	yi4 qi3	together	HSK2
+";
+
+    function parseCSV(text){
+      var delim = text.indexOf('\t')>-1 ? '\t' : ',';
+      var lines = text.split(/\r?\n/).filter(function(l){return l.trim().length>0;});
+      if(lines.length===0) return [];
+      var headers = lines[0].split(delim).map(function(h){return h.trim().toLowerCase();});
+      var idx = {hanzi:headers.indexOf('hanzi'), pinyin:headers.indexOf('pinyin'), english:headers.indexOf('english'), level:headers.indexOf('level')};
+      var out=[], i;
+      for(i=1;i<lines.length;i++){
+        var cols = splitSmart(lines[i], delim);
+        out.push({
+          hanzi: idx.hanzi>=0 ? (cols[idx.hanzi]||'').trim() : '',
+          pinyin: idx.pinyin>=0 ? (cols[idx.pinyin]||'').trim() : '',
+          english: idx.english>=0 ? (cols[idx.english]||'').trim() : '',
+          level: idx.level>=0 ? (cols[idx.level]||'').trim() : ''
+        });
+      }
+      return out.filter(function(r){ return r.hanzi||r.english||r.pinyin; });
+    }
+    function splitSmart(line, delim){
+      var out=[], cur='', inQ=false, i, ch, nxt;
+      for(i=0;i<line.length;i++){
+        ch=line[i]; nxt=line[i+1];
+        if(ch==='"'){
+          if(inQ && nxt==='"'){ cur+='"'; i++; }
+          else { inQ=!inQ; }
+        }else if(ch===delim && !inQ){ out.push(cur); cur=''; }
+        else cur+=ch;
+      }
+      out.push(cur); return out;
+    }
+    function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+    function buildQueue(size){ var idxs = deck.map(function(_,i){return i;}); shuffle(idxs); queue = idxs.slice(0, Math.min(size, idxs.length)); ptr=0; document.getElementById('queueCount').textContent = queue.length; }
+    function renderSides(card){
+      var front='', back='', meta='';
+      if(mode==='hz2en'){ front=card.hanzi||card.pinyin||'—'; back=card.english||''; meta=card.pinyin; }
+      if(mode==='en2hz'){ front=card.english||'—'; back=card.hanzi||card.pinyin||''; meta=card.pinyin; }
+      if(mode==='hz2py'){ front=card.hanzi||'—'; back=card.pinyin||''; meta=card.english; }
+      if(mode==='py2hz'){ front=card.pinyin||'—'; back=card.hanzi||''; meta=card.english; }
+      return {front:front, back:back, meta:(card.level? card.level+' • ' : '') + (meta||'')};
+    }
+    function showCard(){
+      if(queue.length===0){ frontEl.textContent='Load Preloaded HSK or add a deck'; backEl.style.display='none'; metaEl.textContent=''; return; }
+      if(ptr>=queue.length){
+        frontEl.innerHTML='Session complete 🎉';
+        backEl.style.display='block';
+        backEl.innerHTML='<span style="color:#22c55e">Correct: '+stats.correct+'</span> • <span style="color:#f87171">Missed: '+stats.missed+'</span>';
+        metaEl.textContent='Tap Start Session to go again'; return;
+      }
+      var card = deck[ queue[ptr] ]; var r = renderSides(card);
+      frontEl.textContent=r.front; backEl.textContent=r.back; backEl.style.display = flipped ? 'block':'none'; metaEl.textContent=r.meta;
+    }
+    function flip(){ flipped=!flipped; backEl.style.display = flipped ? 'block':'none'; }
+    function next(){ if(ptr<queue.length){ ptr++; } flipped=false; showCard(); }
+    function got(){ if(ptr>=queue.length) return; stats.seen++; stats.correct++; document.getElementById('seen').textContent=stats.seen; document.getElementById('correct').textContent=stats.correct; queue.splice(ptr,1); document.getElementById('queueCount').textContent=queue.length; flipped=false; showCard(); }
+    function miss(){ if(ptr>=queue.length) return; stats.seen++; stats.missed++; document.getElementById('seen').textContent=stats.seen; document.getElementById('missed').textContent=stats.missed; var cur = queue[ptr]; queue.splice(ptr,1); var re = Math.min(queue.length, ptr + 5 + Math.floor(Math.random()*3)); queue.splice(re,0,cur); document.getElementById('queueCount').textContent=queue.length; flipped=false; showCard(); }
+
+    document.getElementById('loadHSK').addEventListener('click', function(){
+      deck = parseCSV(preloaded);
+      stats = {seen:0,correct:0,missed:0};
+      buildQueue(parseInt(document.getElementById('sess').value||'15',10));
+      flipped=false; showCard();
+    });
+    document.getElementById('file').addEventListener('change', function(e){
+      var f=e.target.files[0]; if(!f) return;
+      f.text().then(function(text){
+        var parsed = parseCSV(text);
+        if(parsed.length===0) return alert('Could not parse any rows. Ensure headers: hanzi,pinyin,english,level');
+        deck=parsed; stats={seen:0,correct:0,missed:0}; buildQueue(parseInt(document.getElementById('sess').value||'15',10)); flipped=false; showCard();
+      });
+    });
+    document.getElementById('usePasted').addEventListener('click', function(){
+      var text = document.getElementById('paste').value.trim();
+      if(!text) return alert('Paste CSV/TSV first.');
+      var parsed = parseCSV(text);
+      if(parsed.length===0) return alert('No rows parsed; check headers.');
+      deck=parsed; stats={seen:0,correct:0,missed:0}; buildQueue(parseInt(document.getElementById('sess').value||'15',10)); flipped=false; showCard();
+    });
+    document.getElementById('clearPasted').addEventListener('click', function(){ document.getElementById('paste').value=''; });
+    document.getElementById('start').addEventListener('click', function(){
+      if(deck.length===0) return alert('Load Preloaded HSK or add a deck first.');
+      var s = Math.max(5, Math.min(100, parseInt(document.getElementById('sess').value||'15',10)));
+      localStorage.setItem('sessSize', String(s));
+      document.getElementById('sessLabel').textContent=s;
+      stats={seen:0,correct:0,missed:0};
+      buildQueue(s); flipped=false; showCard();
+    });
+    document.getElementById('mode').addEventListener('change', function(e){
+      mode=e.target.value; localStorage.setItem('mode',mode);
+      var labels={'hz2en':'Hanzi → English','en2hz':'English → Hanzi','hz2py':'Hanzi → Pinyin','py2hz':'Pinyin → Hanzi'};
+      document.getElementById('modeLabel').textContent = labels[mode];
+      flipped=false; showCard();
+    });
+
+    // Init labels
+    document.getElementById('mode').value = mode;
+    document.getElementById('sess').value = sessSize;
+    document.getElementById('sessLabel').textContent = sessSize;
+    document.addEventListener('keydown', function(e){
+      if(e.repeat) return; var k=e.key.toLowerCase();
+      if(k==='f') flip(); else if(k==='g') got(); else if(k==='m') miss(); else if(k==='n'||k===' ') { next(); e.preventDefault(); }
+    });
+  </script>
+</body>
+</html>
