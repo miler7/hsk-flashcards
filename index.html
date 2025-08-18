@@ -151,7 +151,7 @@
     document.getElementById('loadHSK').addEventListener('click', function(){
       deck = PRELOADED.slice();
       stats = {seen:0,correct:0,missed:0};
-      var s = parseInt(document.getElementById('sess').value||'15',10);
+      var s = parseInt(document.getElementById('sess').value, 10); if(isNaN(s)) s = 15;
       buildQueue(Math.max(5, Math.min(100, s)));
       flipped=false; showCard();
     });
@@ -192,7 +192,7 @@
       f.text().then(function(text){
         var parsed = parseCSV(text);
         if(parsed.length===0) return alert('Could not parse any rows. Ensure headers: hanzi,pinyin,english,level');
-        deck=parsed; stats={seen:0,correct:0,missed:0}; buildQueue(parseInt(document.getElementById('sess').value||'15',10)); flipped=false; showCard();
+        deck=parsed; stats={seen:0,correct:0,missed:0}; var s2 = parseInt(document.getElementById('sess').value, 10); if(isNaN(s2)) s2 = 15; buildQueue(s2); flipped=false; showCard();
       });
     });
     document.getElementById('usePasted').addEventListener('click', function(){
@@ -200,7 +200,7 @@
       if(!text) return alert('Paste CSV/TSV first.');
       var parsed = parseCSV(text);
       if(parsed.length===0) return alert('No rows parsed; check headers.');
-      deck=parsed; stats={seen:0,correct:0,missed:0}; buildQueue(parseInt(document.getElementById('sess').value||'15',10)); flipped=false; showCard();
+      deck=parsed; stats={seen:0,correct:0,missed:0}; var s2 = parseInt(document.getElementById('sess').value, 10); if(isNaN(s2)) s2 = 15; buildQueue(s2); flipped=false; showCard();
     });
     document.getElementById('clearPasted').addEventListener('click', function(){ document.getElementById('paste').value=''; });
 
