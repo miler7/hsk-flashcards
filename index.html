@@ -44,7 +44,12 @@
   <header>
     <div>
       <h1>HSK 1–2 Flashcards <span class="sub">— offline, preloaded</span></h1>
-      <div class="sub">Tap “Load Preloaded HSK” → “Start Session”. If nothing happens, use Reload Cache.</div>
+      <div class="sub">Pinyin style: 
+        <select id="pyStyle">
+          <option value="marks">Tone marks (bú yào)</option>
+          <option value="numbers">Numbers (bu2 yao4)</option>
+        </select>
+      </div>
     </div>
     <div class="row">
       <span class="pill"><b>Flip</b>: <span id="modeLabel">Hanzi → English</span></span>
@@ -125,10 +130,63 @@
     var sessSize = parseInt(localStorage.getItem('sessSize')||'15',10);
     var frontEl = document.getElementById('front'), backEl=document.getElementById('back'), metaEl=document.getElementById('meta');
     var badge = document.getElementById('badge'); var toast = document.getElementById('toast');
+    var pyStyle = localStorage.getItem('pyStyle') || 'marks'; document.getElementById('pyStyle').value = pyStyle;
 
     var PRELOADED = [{"hanzi": "你好", "pinyin": "ni3 hao3", "english": "hello", "level": "HSK1"}, {"hanzi": "谢谢", "pinyin": "xie4 xie", "english": "thanks", "level": "HSK1"}, {"hanzi": "请", "pinyin": "qing3", "english": "please", "level": "HSK1"}, {"hanzi": "对不起", "pinyin": "dui4 bu4 qi3", "english": "sorry", "level": "HSK1"}, {"hanzi": "没关系", "pinyin": "mei2 guan1 xi", "english": "no problem", "level": "HSK1"}, {"hanzi": "再见", "pinyin": "zai4 jian4", "english": "goodbye", "level": "HSK1"}, {"hanzi": "是", "pinyin": "shi4", "english": "to be", "level": "HSK1"}, {"hanzi": "不是", "pinyin": "bu2 shi4", "english": "not be", "level": "HSK1"}, {"hanzi": "要", "pinyin": "yao4", "english": "to want", "level": "HSK1"}, {"hanzi": "不要", "pinyin": "bu2 yao4", "english": "don't want", "level": "HSK1"}, {"hanzi": "有", "pinyin": "you3", "english": "to have", "level": "HSK1"}, {"hanzi": "没有", "pinyin": "mei2 you3", "english": "don't have", "level": "HSK1"}, {"hanzi": "吃", "pinyin": "chi1", "english": "to eat", "level": "HSK1"}, {"hanzi": "喝", "pinyin": "he1", "english": "to drink", "level": "HSK1"}, {"hanzi": "水", "pinyin": "shui3", "english": "water", "level": "HSK1"}, {"hanzi": "米饭", "pinyin": "mi3 fan4", "english": "rice", "level": "HSK1"}, {"hanzi": "多少", "pinyin": "duo1 shao3", "english": "how much / how many", "level": "HSK1"}, {"hanzi": "这", "pinyin": "zhe4", "english": "this", "level": "HSK1"}, {"hanzi": "那", "pinyin": "na4", "english": "that", "level": "HSK1"}, {"hanzi": "哪里", "pinyin": "na3 li3", "english": "where", "level": "HSK1"}, {"hanzi": "今天", "pinyin": "jin1 tian1", "english": "today", "level": "HSK1"}, {"hanzi": "昨天", "pinyin": "zuo2 tian1", "english": "yesterday", "level": "HSK1"}, {"hanzi": "明天", "pinyin": "ming2 tian1", "english": "tomorrow", "level": "HSK1"}, {"hanzi": "现在", "pinyin": "xian4 zai4", "english": "now", "level": "HSK1"}, {"hanzi": "点", "pinyin": "dian3", "english": "o'clock", "level": "HSK1"}, {"hanzi": "分钟", "pinyin": "fen1 zhong1", "english": "minute", "level": "HSK1"}, {"hanzi": "晚上", "pinyin": "wan3 shang4", "english": "evening", "level": "HSK1"}, {"hanzi": "星期", "pinyin": "xing1 qi1", "english": "week", "level": "HSK1"}, {"hanzi": "名字", "pinyin": "ming2 zi", "english": "name", "level": "HSK1"}, {"hanzi": "朋友", "pinyin": "peng2 you", "english": "friend", "level": "HSK1"}, {"hanzi": "家", "pinyin": "jia1", "english": "home/family", "level": "HSK1"}, {"hanzi": "老师", "pinyin": "lao3 shi1", "english": "teacher", "level": "HSK1"}, {"hanzi": "学生", "pinyin": "xue2 sheng1", "english": "student", "level": "HSK1"}, {"hanzi": "医生", "pinyin": "yi1 sheng1", "english": "doctor", "level": "HSK1"}, {"hanzi": "喜欢", "pinyin": "xi3 huan1", "english": "to like", "level": "HSK1"}, {"hanzi": "想", "pinyin": "xiang3", "english": "to want / think", "level": "HSK1"}, {"hanzi": "会", "pinyin": "hui4", "english": "can / know how", "level": "HSK1"}, {"hanzi": "可以", "pinyin": "ke3 yi3", "english": "may / can", "level": "HSK1"}, {"hanzi": "去", "pinyin": "qu4", "english": "to go", "level": "HSK1"}, {"hanzi": "来", "pinyin": "lai2", "english": "to come", "level": "HSK1"}, {"hanzi": "住", "pinyin": "zhu4", "english": "to live", "level": "HSK1"}, {"hanzi": "走", "pinyin": "zou3", "english": "to walk", "level": "HSK1"}, {"hanzi": "看", "pinyin": "kan4", "english": "to look / read", "level": "HSK1"}, {"hanzi": "听", "pinyin": "ting1", "english": "to listen", "level": "HSK1"}, {"hanzi": "说话", "pinyin": "shuo1 hua4", "english": "to speak", "level": "HSK1"}, {"hanzi": "问", "pinyin": "wen4", "english": "to ask", "level": "HSK1"}, {"hanzi": "认识", "pinyin": "ren4 shi", "english": "to know (someone)", "level": "HSK1"}];
 
     function showToast(msg){ toast.textContent = msg; toast.style.display='block'; setTimeout(function(){ toast.style.display='none'; }, 1200); }
+
+    // Pinyin tone mark converter (numbers->marks)
+    (function(){
+      var map = {
+        'a': ['ā','á','ǎ','à'], 'e': ['ē','é','ě','è'], 'i': ['ī','í','ǐ','ì'],
+        'o': ['ō','ó','ǒ','ò'], 'u': ['ū','ú','ǔ','ù'], 'v': ['ǖ','ǘ','ǚ','ǜ'], 'ü': ['ǖ','ǘ','ǚ','ǜ']
+      };
+      function markSyllable(syl){
+        var m = syl.match(/^([a-züv]+)([1-5])$/i);
+        if(!m) return syl;
+        var base = m[1].replace('u:', 'v'); // allow u:
+        var tone = parseInt(m[2],10);
+        if(tone===5 || tone===0) return base.replace('v','ü'); // neutral tone
+        var lower = base.toLowerCase();
+        var vowels = ['a','e','o','i','u','v','ü'];
+        // priority: a > e > ou/o > i/u/ü ; special ui/iu -> mark second vowel
+        var idx = -1;
+        if(lower.indexOf('a')>-1) idx = lower.indexOf('a');
+        else if(lower.indexOf('e')>-1) idx = lower.indexOf('e');
+        else if(lower.indexOf('ou')>-1) idx = lower.indexOf('o');
+        else {
+          var ui = lower.indexOf('ui'), iu = lower.indexOf('iu');
+          if(ui>-1) idx = ui+1;
+          else if(iu>-1) idx = iu+1;
+          else {
+            for(var k=0;k<vowels.length;k++){ var v=vowels[k]; var p = lower.indexOf(v); if(p>-1){ idx=p; break; } }
+          }
+        }
+        if(idx===-1) return syl;
+        var ch = base[idx];
+        var isUpper = (ch === ch.toUpperCase());
+        var key = ch.toLowerCase();
+        if(key==='u' and lower[idx+1]===':'){ key='v'; }
+        var marked = (map[key]||[])[tone-1] || ch;
+        if(isUpper) marked = marked.toUpperCase();
+        var out = base.slice(0,idx) + marked + base.slice(idx+1);
+        return out.replace(/v/g, 'ü');
+      }
+      window.pinyinToMarks = function(p){
+        return p.split(/\s+/).map(function(tok){
+          // allow plain tokens like "shi" or punctuation
+          if(/^[a-züv]+[0-5]$/i.test(tok)) return markSyllable(tok);
+          // handle tokens like "shuo1" and "hua4" separated by space already
+          return tok.replace(/([a-züv]+[1-5])/ig, function(s){ return markSyllable(s); });
+        }).join(' ').replace(/v/g,'ü');
+      };
+    })();
+
+    function displayPinyin(p){
+      if(pyStyle==='numbers') return p;
+      try{ return window.pinyinToMarks(p); }catch(e){ return p; }
+    }
 
     function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
     function buildQueue(size){
@@ -145,10 +203,10 @@
     }
     function renderSides(card){
       var front='', back='', meta='';
-      if(mode==='hz2en'){ front=card.hanzi||card.pinyin||'—'; back=card.english||''; meta=card.pinyin; }
-      if(mode==='en2hz'){ front=card.english||'—'; back=card.hanzi||card.pinyin||''; meta=card.pinyin; }
-      if(mode==='hz2py'){ front=card.hanzi||'—'; back=card.pinyin||''; meta=card.english; }
-      if(mode==='py2hz'){ front=card.pinyin||'—'; back=card.hanzi||''; meta=card.english; }
+      if(mode==='hz2en'){ front=card.hanzi||card.pinyin||'—'; back=card.english||''; meta=displayPinyin(card.pinyin||''); }
+      if(mode==='en2hz'){ front=card.english||'—'; back=card.hanzi||card.pinyin||''; meta=displayPinyin(card.pinyin||''); }
+      if(mode==='hz2py'){ front=card.hanzi||'—'; back=displayPinyin(card.pinyin||''); meta=card.english; }
+      if(mode==='py2hz'){ front=displayPinyin(card.pinyin||'—'); back=card.hanzi||''; meta=card.english; }
       return {front:front, back:back, meta:(card.level? card.level+' • ' : '') + (meta||'')};
     }
     function showCard(){
@@ -204,6 +262,11 @@
       var labels={'hz2en':'Hanzi → English','en2hz':'English → Hanzi','hz2py':'Hanzi → Pinyin','py2hz':'Pinyin → Hanzi'};
       document.getElementById('modeLabel').textContent = labels[mode];
       flipped=false; showCard();
+    });
+
+    document.getElementById('pyStyle').addEventListener('change', function(e){
+      pyStyle = e.target.value; localStorage.setItem('pyStyle', pyStyle);
+      showCard();
     });
 
     document.getElementById('file').addEventListener('change', function(e){
