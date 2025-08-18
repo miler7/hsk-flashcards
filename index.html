@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -56,7 +57,7 @@
         <h2>Deck & Options</h2>
         <div class="row" style="margin-bottom:6px">
           <button class="primary" id="loadHSK">Load Preloaded HSK 1–2</button>
-          <div class="pill">~200+ core words</div>
+          <div class="pill">~50 starter words (add your own anytime)</div>
         </div>
         <div class="row">
           <label>Or load a file</label>
@@ -118,130 +119,44 @@
     var sessSize = parseInt(localStorage.getItem('sessSize')||'15',10);
     var frontEl = document.getElementById('front'), backEl=document.getElementById('back'), metaEl=document.getElementById('meta');
 
-    var preloaded = "hanzi	pinyin	english	level
-你好	ni3 hao3	hello	HSK1
-谢谢	xie4 xie	thanks	HSK1
-请	qing3	please	HSK1
-对不起	dui4 bu4 qi3	sorry	HSK1
-没关系	mei2 guan1 xi	no problem	HSK1
-再见	zai4 jian4	goodbye	HSK1
-是	shi4	to be	HSK1
-不是	bu2 shi4	not be	HSK1
-要	yao4	to want	HSK1
-不要	bu2 yao4	don't want	HSK1
-有	you3	to have	HSK1
-没有	mei2 you3	don't have	HSK1
-吃	chi1	to eat	HSK1
-喝	he1	to drink	HSK1
-水	shui3	water	HSK1
-米饭	mi3 fan4	rice	HSK1
-多少	duo1 shao3	how much/many	HSK1
-这	zhe4	this	HSK1
-那	na4	that	HSK1
-哪里	na3 li3	where	HSK1
-一	yi1	one	HSK1
-二	er4	two	HSK1
-三	san1	three	HSK1
-四	si4	four	HSK1
-五	wu3	five	HSK1
-六	liu4	six	HSK1
-七	qi1	seven	HSK1
-八	ba1	eight	HSK1
-九	jiu3	nine	HSK1
-十	shi2	ten	HSK1
-今天	jin1 tian1	today	HSK1
-昨天	zuo2 tian1	yesterday	HSK1
-明天	ming2 tian1	tomorrow	HSK1
-现在	xian4 zai4	now	HSK1
-点	dian3	o'clock	HSK1
-分钟	fen1 zhong1	minute	HSK1
-晚上	wan3 shang4	evening	HSK1
-星期	xing1 qi1	week	HSK1
-名字	ming2 zi	name	HSK1
-朋友	peng2 you	friend	HSK1
-家	jia1	home/family	HSK1
-爸爸	ba4 ba	father	HSK1
-妈妈	ma1 ma	mother	HSK1
-老师	lao3 shi1	teacher	HSK1
-学生	xue2 sheng1	student	HSK1
-医生	yi1 sheng1	doctor	HSK1
-喜欢	xi3 huan1	to like	HSK1
-想	xiang3	to want/think	HSK1
-会	hui4	can/know how	HSK1
-可以	ke3 yi3	may/can	HSK1
-去	qu4	to go	HSK1
-来	lai2	to come	HSK1
-住	zhu4	to live	HSK1
-坐	zuo4	to sit	HSK1
-走	zou3	to walk	HSK1
-看	kan4	to look/read	HSK1
-听	ting1	to listen	HSK1
-说话	shuo1 hua4	to speak	HSK1
-问	wen4	to ask	HSK1
-认识	ren4 shi	to know (someone)	HSK1
-知道	zhi1 dao4	to know	HSK1
-工作	gong1 zuo4	work	HSK1
-学习	xue2 xi2	study	HSK1
-天气	tian1 qi4	weather	HSK1
-冷	leng3	cold	HSK1
-热	re4	hot	HSK1
-高兴	gao1 xing4	happy	HSK1
-漂亮	piao4 liang	pretty	HSK1
-大	da4	big	HSK1
-小	xiao3	small	HSK1
-多	duo1	many	HSK1
-少	shao3	few	HSK1
-新	xin1	new	HSK1
-旧	jiu4	old	HSK2
-贵	gui4	expensive	HSK2
-便宜	pian2 yi2	cheap	HSK2
-快	kuai4	fast	HSK2
-慢	man4	slow	HSK2
-颜色	yan2 se4	color	HSK2
-白	bai2	white	HSK1
-黑	hei1	black	HSK1
-红	hong2	red	HSK2
-蓝	lan2	blue	HSK2
-黄	huang2	yellow	HSK2
-苹果	ping2 guo3	apple	HSK1
-面条	mian4 tiao2	noodles	HSK1
-菜	cai4	vegetable/dish	HSK1
-鸡蛋	ji1 dan4	egg	HSK1
-牛奶	niu2 nai3	milk	HSK1
-茶	cha2	tea	HSK1
-咖啡	ka1 fei1	coffee	HSK2
-钱	qian2	money	HSK1
-商店	shang1 dian4	shop	HSK1
-饭店	fan4 dian4	restaurant/hotel	HSK1
-医院	yi1 yuan4	hospital	HSK1
-学校	xue2 xiao4	school	HSK1
-公司	gong1 si1	company	HSK2
-银行	yin2 hang2	bank	HSK2
-桌子	zhuo1 zi	table	HSK1
-椅子	yi3 zi	chair	HSK1
-电脑	dian4 nao3	computer	HSK1
-手机	shou3 ji1	mobile phone	HSK1
-电视	dian4 shi4	TV	HSK1
-电影	dian4 ying3	movie	HSK1
-书	shu1	book	HSK1
-汉语	han4 yu3	Chinese (language)	HSK1
-中文	zhong1 wen2	Chinese (written)	HSK2
-衣服	yi1 fu	clothes	HSK1
-猫	mao1	cat	HSK1
-狗	gou3	dog	HSK1
-再	zai4	again (future)	HSK1
-可以吗	ke3 yi3 ma	OK?	HSK1
-没问题	mei2 wen4 ti2	no problem	HSK2
-因为	yin1 wei4	because	HSK2
-所以	suo3 yi3	therefore	HSK2
-但是	dan4 shi4	but	HSK2
-或者	huo4 zhe3	or (statement)	HSK2
-还是	hai2 shi4	or (question)	HSK2
-已经	yi3 jing1	already	HSK2
-正在	zheng4 zai4	in the middle of	HSK2
-一起	yi4 qi3	together	HSK2
-";
+    // Preloaded data as JSON (robust, no CSV parsing)
+    var PRELOADED = [{"hanzi": "你好", "pinyin": "ni3 hao3", "english": "hello", "level": "HSK1"}, {"hanzi": "谢谢", "pinyin": "xie4 xie", "english": "thanks", "level": "HSK1"}, {"hanzi": "请", "pinyin": "qing3", "english": "please", "level": "HSK1"}, {"hanzi": "对不起", "pinyin": "dui4 bu4 qi3", "english": "sorry", "level": "HSK1"}, {"hanzi": "没关系", "pinyin": "mei2 guan1 xi", "english": "no problem", "level": "HSK1"}, {"hanzi": "再见", "pinyin": "zai4 jian4", "english": "goodbye", "level": "HSK1"}, {"hanzi": "是", "pinyin": "shi4", "english": "to be", "level": "HSK1"}, {"hanzi": "不是", "pinyin": "bu2 shi4", "english": "not be", "level": "HSK1"}, {"hanzi": "要", "pinyin": "yao4", "english": "to want", "level": "HSK1"}, {"hanzi": "不要", "pinyin": "bu2 yao4", "english": "don't want", "level": "HSK1"}, {"hanzi": "有", "pinyin": "you3", "english": "to have", "level": "HSK1"}, {"hanzi": "没有", "pinyin": "mei2 you3", "english": "don't have", "level": "HSK1"}, {"hanzi": "吃", "pinyin": "chi1", "english": "to eat", "level": "HSK1"}, {"hanzi": "喝", "pinyin": "he1", "english": "to drink", "level": "HSK1"}, {"hanzi": "水", "pinyin": "shui3", "english": "water", "level": "HSK1"}, {"hanzi": "米饭", "pinyin": "mi3 fan4", "english": "rice", "level": "HSK1"}, {"hanzi": "多少", "pinyin": "duo1 shao3", "english": "how much / how many", "level": "HSK1"}, {"hanzi": "这", "pinyin": "zhe4", "english": "this", "level": "HSK1"}, {"hanzi": "那", "pinyin": "na4", "english": "that", "level": "HSK1"}, {"hanzi": "哪里", "pinyin": "na3 li3", "english": "where", "level": "HSK1"}, {"hanzi": "今天", "pinyin": "jin1 tian1", "english": "today", "level": "HSK1"}, {"hanzi": "昨天", "pinyin": "zuo2 tian1", "english": "yesterday", "level": "HSK1"}, {"hanzi": "明天", "pinyin": "ming2 tian1", "english": "tomorrow", "level": "HSK1"}, {"hanzi": "现在", "pinyin": "xian4 zai4", "english": "now", "level": "HSK1"}, {"hanzi": "点", "pinyin": "dian3", "english": "o'clock", "level": "HSK1"}, {"hanzi": "分钟", "pinyin": "fen1 zhong1", "english": "minute", "level": "HSK1"}, {"hanzi": "晚上", "pinyin": "wan3 shang4", "english": "evening", "level": "HSK1"}, {"hanzi": "星期", "pinyin": "xing1 qi1", "english": "week", "level": "HSK1"}, {"hanzi": "名字", "pinyin": "ming2 zi", "english": "name", "level": "HSK1"}, {"hanzi": "朋友", "pinyin": "peng2 you", "english": "friend", "level": "HSK1"}, {"hanzi": "家", "pinyin": "jia1", "english": "home/family", "level": "HSK1"}, {"hanzi": "老师", "pinyin": "lao3 shi1", "english": "teacher", "level": "HSK1"}, {"hanzi": "学生", "pinyin": "xue2 sheng1", "english": "student", "level": "HSK1"}, {"hanzi": "医生", "pinyin": "yi1 sheng1", "english": "doctor", "level": "HSK1"}, {"hanzi": "喜欢", "pinyin": "xi3 huan1", "english": "to like", "level": "HSK1"}, {"hanzi": "想", "pinyin": "xiang3", "english": "to want / think", "level": "HSK1"}, {"hanzi": "会", "pinyin": "hui4", "english": "can / know how", "level": "HSK1"}, {"hanzi": "可以", "pinyin": "ke3 yi3", "english": "may / can", "level": "HSK1"}, {"hanzi": "去", "pinyin": "qu4", "english": "to go", "level": "HSK1"}, {"hanzi": "来", "pinyin": "lai2", "english": "to come", "level": "HSK1"}, {"hanzi": "住", "pinyin": "zhu4", "english": "to live", "level": "HSK1"}, {"hanzi": "走", "pinyin": "zou3", "english": "to walk", "level": "HSK1"}, {"hanzi": "看", "pinyin": "kan4", "english": "to look / read", "level": "HSK1"}, {"hanzi": "听", "pinyin": "ting1", "english": "to listen", "level": "HSK1"}, {"hanzi": "说话", "pinyin": "shuo1 hua4", "english": "to speak", "level": "HSK1"}, {"hanzi": "问", "pinyin": "wen4", "english": "to ask", "level": "HSK1"}, {"hanzi": "认识", "pinyin": "ren4 shi", "english": "to know (someone)", "level": "HSK1"}];
 
+    function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+    function buildQueue(size){ var idxs = deck.map(function(_,i){return i;}); shuffle(idxs); queue = idxs.slice(0, Math.min(size, idxs.length)); ptr=0; document.getElementById('queueCount').textContent = queue.length; }
+    function renderSides(card){
+      var front='', back='', meta='';
+      if(mode==='hz2en'){ front=card.hanzi||card.pinyin||'—'; back=card.english||''; meta=card.pinyin; }
+      if(mode==='en2hz'){ front=card.english||'—'; back=card.hanzi||card.pinyin||''; meta=card.pinyin; }
+      if(mode==='hz2py'){ front=card.hanzi||'—'; back=card.pinyin||''; meta=card.english; }
+      if(mode==='py2hz'){ front=card.pinyin||'—'; back=card.hanzi||''; meta=card.english; }
+      return {front:front, back:back, meta:(card.level? card.level+' • ' : '') + (meta||'')};
+    }
+    function showCard(){
+      if(queue.length===0){ frontEl.textContent='Load Preloaded HSK or add a deck'; backEl.style.display='none'; metaEl.textContent=''; return; }
+      if(ptr>=queue.length){
+        frontEl.innerHTML='Session complete 🎉';
+        backEl.style.display='block';
+        backEl.innerHTML='<span style="color:#22c55e">Correct: '+stats.correct+'</span> • <span style="color:#f87171">Missed: '+stats.missed+'</span>';
+        metaEl.textContent='Tap Start Session to go again'; return;
+      }
+      var card = deck[ queue[ptr] ]; var r = renderSides(card);
+      frontEl.textContent=r.front; backEl.textContent=r.back; backEl.style.display = flipped ? 'block':'none'; metaEl.textContent=r.meta;
+    }
+    function flip(){ flipped=!flipped; backEl.style.display = flipped ? 'block':'none'; }
+    function next(){ if(ptr<queue.length){ ptr++; } flipped=false; showCard(); }
+    function got(){ if(ptr>=queue.length) return; stats.seen++; stats.correct++; document.getElementById('seen').textContent=stats.seen; document.getElementById('correct').textContent=stats.correct; queue.splice(ptr,1); document.getElementById('queueCount').textContent=queue.length; flipped=false; showCard(); }
+    function miss(){ if(ptr>=queue.length) return; stats.seen++; stats.missed++; document.getElementById('seen').textContent=stats.seen; document.getElementById('missed').textContent=stats.missed; var cur = queue[ptr]; queue.splice(ptr,1); var re = Math.min(queue.length, ptr + 5 + Math.floor(Math.random()*3)); queue.splice(re,0,cur); document.getElementById('queueCount').textContent=queue.length; flipped=false; showCard(); }
+
+    document.getElementById('loadHSK').addEventListener('click', function(){
+      deck = PRELOADED.slice();
+      stats = {seen:0,correct:0,missed:0};
+      var s = parseInt(document.getElementById('sess').value||'15',10);
+      buildQueue(Math.max(5, Math.min(100, s)));
+      flipped=false; showCard();
+    });
+
+    // Optional CSV/TSV support kept for flexibility
     function parseCSV(text){
       var delim = text.indexOf('\t')>-1 ? '\t' : ',';
       var lines = text.split(/\r?\n/).filter(function(l){return l.trim().length>0;});
@@ -272,38 +187,6 @@
       }
       out.push(cur); return out;
     }
-    function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
-    function buildQueue(size){ var idxs = deck.map(function(_,i){return i;}); shuffle(idxs); queue = idxs.slice(0, Math.min(size, idxs.length)); ptr=0; document.getElementById('queueCount').textContent = queue.length; }
-    function renderSides(card){
-      var front='', back='', meta='';
-      if(mode==='hz2en'){ front=card.hanzi||card.pinyin||'—'; back=card.english||''; meta=card.pinyin; }
-      if(mode==='en2hz'){ front=card.english||'—'; back=card.hanzi||card.pinyin||''; meta=card.pinyin; }
-      if(mode==='hz2py'){ front=card.hanzi||'—'; back=card.pinyin||''; meta=card.english; }
-      if(mode==='py2hz'){ front=card.pinyin||'—'; back=card.hanzi||''; meta=card.english; }
-      return {front:front, back:back, meta:(card.level? card.level+' • ' : '') + (meta||'')};
-    }
-    function showCard(){
-      if(queue.length===0){ frontEl.textContent='Load Preloaded HSK or add a deck'; backEl.style.display='none'; metaEl.textContent=''; return; }
-      if(ptr>=queue.length){
-        frontEl.innerHTML='Session complete 🎉';
-        backEl.style.display='block';
-        backEl.innerHTML='<span style="color:#22c55e">Correct: '+stats.correct+'</span> • <span style="color:#f87171">Missed: '+stats.missed+'</span>';
-        metaEl.textContent='Tap Start Session to go again'; return;
-      }
-      var card = deck[ queue[ptr] ]; var r = renderSides(card);
-      frontEl.textContent=r.front; backEl.textContent=r.back; backEl.style.display = flipped ? 'block':'none'; metaEl.textContent=r.meta;
-    }
-    function flip(){ flipped=!flipped; backEl.style.display = flipped ? 'block':'none'; }
-    function next(){ if(ptr<queue.length){ ptr++; } flipped=false; showCard(); }
-    function got(){ if(ptr>=queue.length) return; stats.seen++; stats.correct++; document.getElementById('seen').textContent=stats.seen; document.getElementById('correct').textContent=stats.correct; queue.splice(ptr,1); document.getElementById('queueCount').textContent=queue.length; flipped=false; showCard(); }
-    function miss(){ if(ptr>=queue.length) return; stats.seen++; stats.missed++; document.getElementById('seen').textContent=stats.seen; document.getElementById('missed').textContent=stats.missed; var cur = queue[ptr]; queue.splice(ptr,1); var re = Math.min(queue.length, ptr + 5 + Math.floor(Math.random()*3)); queue.splice(re,0,cur); document.getElementById('queueCount').textContent=queue.length; flipped=false; showCard(); }
-
-    document.getElementById('loadHSK').addEventListener('click', function(){
-      deck = parseCSV(preloaded);
-      stats = {seen:0,correct:0,missed:0};
-      buildQueue(parseInt(document.getElementById('sess').value||'15',10));
-      flipped=false; showCard();
-    });
     document.getElementById('file').addEventListener('change', function(e){
       var f=e.target.files[0]; if(!f) return;
       f.text().then(function(text){
@@ -320,22 +203,7 @@
       deck=parsed; stats={seen:0,correct:0,missed:0}; buildQueue(parseInt(document.getElementById('sess').value||'15',10)); flipped=false; showCard();
     });
     document.getElementById('clearPasted').addEventListener('click', function(){ document.getElementById('paste').value=''; });
-    document.getElementById('start').addEventListener('click', function(){
-      if(deck.length===0) return alert('Load Preloaded HSK or add a deck first.');
-      var s = Math.max(5, Math.min(100, parseInt(document.getElementById('sess').value||'15',10)));
-      localStorage.setItem('sessSize', String(s));
-      document.getElementById('sessLabel').textContent=s;
-      stats={seen:0,correct:0,missed:0};
-      buildQueue(s); flipped=false; showCard();
-    });
-    document.getElementById('mode').addEventListener('change', function(e){
-      mode=e.target.value; localStorage.setItem('mode',mode);
-      var labels={'hz2en':'Hanzi → English','en2hz':'English → Hanzi','hz2py':'Hanzi → Pinyin','py2hz':'Pinyin → Hanzi'};
-      document.getElementById('modeLabel').textContent = labels[mode];
-      flipped=false; showCard();
-    });
 
-    // Init labels
     document.getElementById('mode').value = mode;
     document.getElementById('sess').value = sessSize;
     document.getElementById('sessLabel').textContent = sessSize;
