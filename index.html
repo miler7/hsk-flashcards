@@ -23,8 +23,8 @@ input[type=number]{width:90px} button{cursor:pointer;transition:.15s transform,.
 button:hover{transform:translateY(-1px)} button.primary{background:linear-gradient(180deg,#16a34a,#17863f);border-color:#107a37}
 button.secondary{background:#1e293b} button.warn{background:#3b2f0b;border-color:#4d3a0b;color:#facc15} button.ghost{background:transparent;border-color:rgba(255,255,255,.12);color:var(--muted)}
 textarea{width:100%;min-height:120px;resize:vertical;background:#0b1020;color:#e5e7eb;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:10px 12px;font-size:13px;font-family:ui-monospace,Menlo,Consolas,monospace}
-.card{margin:18px;border-radius:var(--radius);background:linear-gradient(180deg,#0b1220,#0a1020);min-height:240px;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;border:1px solid rgba(255,255,255,.08);position:relative}
-.big{font-size:40px;line-height:1.15} .small{font-size:17px;color:#cbd5e1;margin-top:8px} .meta{font-size:13px;color:#94a3b8;margin-top:8px}
+.card{margin:18px;border-radius:var(--radius);background:linear-gradient(180deg,#0b1220,#0a1020);min-height:300px;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;border:1px solid rgba(255,255,255,.08);position:relative}
+.big{font-size:80px;line-height:1.05} .small{font-size:34px;color:#cbd5e1;margin-top:10px} .meta{font-size:18px;color:#94a3b8;margin-top:10px}
 .controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:0 18px 18px}
 .stats{display:flex;gap:12px;flex-wrap:wrap;margin:0 18px 18px;color:#94a3b8;font-size:13px}
 .pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;font-size:12px}
@@ -37,16 +37,24 @@ textarea{width:100%;min-height:120px;resize:vertical;background:#0b1020;color:#e
   <div>
     <h1>HSK 1–2 Flashcards <span class="sub">— offline, preloaded</span></h1>
     <div class="sub">
-      Pinyin style:
+      Start side:
+      <select id="startSide">
+        <option value="mandarin" selected>Mandarin (Hanzi → English)</option>
+        <option value="english">English (English → Hanzi)</option>
+      </select>
+      • Pinyin style:
       <select id="pyStyle">
         <option value="marks" selected>Tone marks (méi yǒu)</option>
         <option value="numbers">Numbers (mei2 you3)</option>
       </select>
+      • Levels:
+      <label><input type="checkbox" id="f1"> HSK1</label>
+      <label><input type="checkbox" id="f2"> HSK2</label>
+      <span class="pill" id="countBadge">0 cards selected</span>
       • If buttons do nothing, tap <b>Reload Cache</b>.
     </div>
   </div>
   <div class="row">
-    <span class="pill"><b>Flip</b>: <span id="modeLabel">Hanzi → English</span></span>
     <span class="pill">Cards/Session: <span id="sessLabel">15</span></span>
     <span class="pill">Queue: <span id="queueCount">0</span></span>
     <button class="ghost" id="btnReset">Reload Cache</button>
@@ -59,7 +67,7 @@ textarea{width:100%;min-height:120px;resize:vertical;background:#0b1020;color:#e
       <h2>Deck & Options</h2>
       <div class="row" style="margin-bottom:6px">
         <button class="primary" id="loadHSK" onclick="__loadHSK()">Load Preloaded HSK 1–2</button>
-        <div class="pill">~50 starter words (add your own anytime)</div>
+        <div class="pill">HSK1 & HSK2 starter set</div>
       </div>
       <div class="row"><label>Or load a file</label><input id="file" type="file" accept=".csv,.tsv,.txt"></div>
       <div class="row" style="margin-top:8px"><label>Or paste list (headers: <code>hanzi,pinyin,english,level</code>)</label></div>
@@ -68,13 +76,6 @@ textarea{width:100%;min-height:120px;resize:vertical;background:#0b1020;color:#e
         <button class="secondary" id="usePasted">Use Pasted Deck</button>
         <button class="ghost" id="clearPasted">Clear</button>
         <div style="flex:1"></div>
-        <label>Flip</label>
-        <select id="mode">
-          <option value="hz2en">Hanzi → English (default)</option>
-          <option value="en2hz">English → Hanzi</option>
-          <option value="hz2py">Hanzi → Pinyin</option>
-          <option value="py2hz">Pinyin → Hanzi</option>
-        </select>
         <label>Cards / session</label>
         <input id="sess" type="number" min="5" max="100" step="1" value="15">
         <button class="secondary" id="start">Start Session</button>
@@ -109,14 +110,19 @@ textarea{width:100%;min-height:120px;resize:vertical;background:#0b1020;color:#e
 
 <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js').catch(function(){})});}</script>
 <script>
+var BASE=[{"hanzi": "你好", "pinyin": "ni3 hao3", "english": "hello", "level": "HSK1"}, {"hanzi": "谢谢", "pinyin": "xie4 xie", "english": "thanks", "level": "HSK1"}, {"hanzi": "请", "pinyin": "qing3", "english": "please", "level": "HSK1"}, {"hanzi": "对不起", "pinyin": "dui4 bu4 qi3", "english": "sorry", "level": "HSK1"}, {"hanzi": "没关系", "pinyin": "mei2 guan1 xi", "english": "no problem", "level": "HSK1"}, {"hanzi": "再见", "pinyin": "zai4 jian4", "english": "goodbye", "level": "HSK1"}, {"hanzi": "是", "pinyin": "shi4", "english": "to be", "level": "HSK1"}, {"hanzi": "不是", "pinyin": "bu2 shi4", "english": "not be", "level": "HSK1"}, {"hanzi": "要", "pinyin": "yao4", "english": "to want", "level": "HSK1"}, {"hanzi": "不要", "pinyin": "bu2 yao4", "english": "don't want", "level": "HSK1"}, {"hanzi": "有", "pinyin": "you3", "english": "to have", "level": "HSK1"}, {"hanzi": "没有", "pinyin": "mei2 you3", "english": "don't have", "level": "HSK1"}, {"hanzi": "吃", "pinyin": "chi1", "english": "to eat", "level": "HSK1"}, {"hanzi": "喝", "pinyin": "he1", "english": "to drink", "level": "HSK1"}, {"hanzi": "水", "pinyin": "shui3", "english": "water", "level": "HSK1"}, {"hanzi": "米饭", "pinyin": "mi3 fan4", "english": "rice", "level": "HSK1"}, {"hanzi": "多少", "pinyin": "duo1 shao3", "english": "how much / how many", "level": "HSK1"}, {"hanzi": "这", "pinyin": "zhe4", "english": "this", "level": "HSK1"}, {"hanzi": "那", "pinyin": "na4", "english": "that", "level": "HSK1"}, {"hanzi": "哪里", "pinyin": "na3 li3", "english": "where", "level": "HSK1"}, {"hanzi": "今天", "pinyin": "jin1 tian1", "english": "today", "level": "HSK1"}, {"hanzi": "昨天", "pinyin": "zuo2 tian1", "english": "yesterday", "level": "HSK1"}, {"hanzi": "明天", "pinyin": "ming2 tian1", "english": "tomorrow", "level": "HSK1"}, {"hanzi": "现在", "pinyin": "xian4 zai4", "english": "now", "level": "HSK1"}, {"hanzi": "点", "pinyin": "dian3", "english": "o'clock", "level": "HSK1"}, {"hanzi": "分钟", "pinyin": "fen1 zhong1", "english": "minute", "level": "HSK1"}, {"hanzi": "晚上", "pinyin": "wan3 shang4", "english": "evening", "level": "HSK1"}, {"hanzi": "星期", "pinyin": "xing1 qi1", "english": "week", "level": "HSK1"}, {"hanzi": "名字", "pinyin": "ming2 zi", "english": "name", "level": "HSK1"}, {"hanzi": "朋友", "pinyin": "peng2 you", "english": "friend", "level": "HSK1"}, {"hanzi": "家", "pinyin": "jia1", "english": "home/family", "level": "HSK1"}, {"hanzi": "老师", "pinyin": "lao3 shi1", "english": "teacher", "level": "HSK1"}, {"hanzi": "学生", "pinyin": "xue2 sheng1", "english": "student", "level": "HSK1"}, {"hanzi": "医生", "pinyin": "yi1 sheng1", "english": "doctor", "level": "HSK1"}, {"hanzi": "喜欢", "pinyin": "xi3 huan1", "english": "to like", "level": "HSK1"}, {"hanzi": "想", "pinyin": "xiang3", "english": "to want / think", "level": "HSK1"}, {"hanzi": "会", "pinyin": "hui4", "english": "can / know how", "level": "HSK1"}, {"hanzi": "可以", "pinyin": "ke3 yi3", "english": "may / can", "level": "HSK1"}, {"hanzi": "去", "pinyin": "qu4", "english": "to go", "level": "HSK1"}, {"hanzi": "来", "pinyin": "lai2", "english": "to come", "level": "HSK1"}, {"hanzi": "住", "pinyin": "zhu4", "english": "to live", "level": "HSK1"}, {"hanzi": "走", "pinyin": "zou3", "english": "to walk", "level": "HSK1"}, {"hanzi": "看", "pinyin": "kan4", "english": "to look / read", "level": "HSK1"}, {"hanzi": "听", "pinyin": "ting1", "english": "to listen", "level": "HSK1"}, {"hanzi": "说话", "pinyin": "shuo1 hua4", "english": "to speak", "level": "HSK1"}, {"hanzi": "问", "pinyin": "wen4", "english": "to ask", "level": "HSK1"}, {"hanzi": "认识", "pinyin": "ren4 shi", "english": "to know (someone)", "level": "HSK1"}, {"hanzi": "因为", "pinyin": "yin1 wei4", "english": "because", "level": "HSK2"}, {"hanzi": "所以", "pinyin": "suo3 yi3", "english": "so/therefore", "level": "HSK2"}, {"hanzi": "但是", "pinyin": "dan4 shi4", "english": "but/however", "level": "HSK2"}, {"hanzi": "还", "pinyin": "hai2", "english": "still/also", "level": "HSK2"}, {"hanzi": "非常", "pinyin": "fei1 chang2", "english": "very", "level": "HSK2"}, {"hanzi": "比", "pinyin": "bi3", "english": "compare/than", "level": "HSK2"}, {"hanzi": "快", "pinyin": "kuai4", "english": "fast", "level": "HSK2"}, {"hanzi": "慢", "pinyin": "man4", "english": "slow", "level": "HSK2"}, {"hanzi": "远", "pinyin": "yuan3", "english": "far", "level": "HSK2"}, {"hanzi": "近", "pinyin": "jin4", "english": "near", "level": "HSK2"}, {"hanzi": "贵", "pinyin": "gui4", "english": "expensive", "level": "HSK2"}, {"hanzi": "便宜", "pinyin": "pian2 yi2", "english": "cheap", "level": "HSK2"}, {"hanzi": "穿", "pinyin": "chuan1", "english": "to wear", "level": "HSK2"}, {"hanzi": "找", "pinyin": "zhao3", "english": "to look for", "level": "HSK2"}, {"hanzi": "唱歌", "pinyin": "chang4 ge1", "english": "to sing", "level": "HSK2"}, {"hanzi": "跳舞", "pinyin": "tiao4 wu3", "english": "to dance", "level": "HSK2"}, {"hanzi": "帮助", "pinyin": "bang1 zhu4", "english": "to help", "level": "HSK2"}, {"hanzi": "告诉", "pinyin": "gao4 su4", "english": "to tell", "level": "HSK2"}, {"hanzi": "准备", "pinyin": "zhun3 bei4", "english": "to prepare", "level": "HSK2"}, {"hanzi": "开始", "pinyin": "kai1 shi3", "english": "to start", "level": "HSK2"}, {"hanzi": "希望", "pinyin": "xi1 wang4", "english": "to hope", "level": "HSK2"}, {"hanzi": "可能", "pinyin": "ke3 neng2", "english": "maybe/possible", "level": "HSK2"}, {"hanzi": "一下", "pinyin": "yi2 xia4", "english": "a little while", "level": "HSK2"}, {"hanzi": "一起", "pinyin": "yi4 qi3", "english": "together", "level": "HSK2"}, {"hanzi": "已经", "pinyin": "yi3 jing1", "english": "already", "level": "HSK2"}, {"hanzi": "正在", "pinyin": "zheng4 zai4", "english": "in the middle of", "level": "HSK2"}, {"hanzi": "从", "pinyin": "cong2", "english": "from", "level": "HSK2"}, {"hanzi": "到", "pinyin": "dao4", "english": "to arrive/until", "level": "HSK2"}, {"hanzi": "给", "pinyin": "gei3", "english": "to give", "level": "HSK2"}, {"hanzi": "让", "pinyin": "rang4", "english": "to let/allow", "level": "HSK2"}];
 var deck=[],queue=[],ptr=0,flipped=false;
 var stats={seen:0,correct:0,missed:0};
-var mode=localStorage.getItem('mode')||'hz2en';
 var sessSize=parseInt(localStorage.getItem('sessSize')||'15',10);
 var pyStyle=localStorage.getItem('pyStyle')||'marks';
+var startSide=localStorage.getItem('startSide')||'mandarin';
+var f1=localStorage.getItem('filterHSK1'); if(f1===null) f1='1';
+var f2=localStorage.getItem('filterHSK2'); if(f2===null) f2='1';
 var frontEl=document.getElementById('front'),backEl=document.getElementById('back'),metaEl=document.getElementById('meta');
-var badge=document.getElementById('badge');var toast=document.getElementById('toast');document.getElementById('pyStyle').value=pyStyle;
-var PRELOADED=[{"hanzi": "你好", "pinyin": "ni3 hao3", "english": "hello", "level": "HSK1"}, {"hanzi": "谢谢", "pinyin": "xie4 xie", "english": "thanks", "level": "HSK1"}, {"hanzi": "请", "pinyin": "qing3", "english": "please", "level": "HSK1"}, {"hanzi": "对不起", "pinyin": "dui4 bu4 qi3", "english": "sorry", "level": "HSK1"}, {"hanzi": "没关系", "pinyin": "mei2 guan1 xi", "english": "no problem", "level": "HSK1"}, {"hanzi": "再见", "pinyin": "zai4 jian4", "english": "goodbye", "level": "HSK1"}, {"hanzi": "是", "pinyin": "shi4", "english": "to be", "level": "HSK1"}, {"hanzi": "不是", "pinyin": "bu2 shi4", "english": "not be", "level": "HSK1"}, {"hanzi": "要", "pinyin": "yao4", "english": "to want", "level": "HSK1"}, {"hanzi": "不要", "pinyin": "bu2 yao4", "english": "don't want", "level": "HSK1"}, {"hanzi": "有", "pinyin": "you3", "english": "to have", "level": "HSK1"}, {"hanzi": "没有", "pinyin": "mei2 you3", "english": "don't have", "level": "HSK1"}, {"hanzi": "吃", "pinyin": "chi1", "english": "to eat", "level": "HSK1"}, {"hanzi": "喝", "pinyin": "he1", "english": "to drink", "level": "HSK1"}, {"hanzi": "水", "pinyin": "shui3", "english": "water", "level": "HSK1"}, {"hanzi": "米饭", "pinyin": "mi3 fan4", "english": "rice", "level": "HSK1"}, {"hanzi": "多少", "pinyin": "duo1 shao3", "english": "how much / how many", "level": "HSK1"}, {"hanzi": "这", "pinyin": "zhe4", "english": "this", "level": "HSK1"}, {"hanzi": "那", "pinyin": "na4", "english": "that", "level": "HSK1"}, {"hanzi": "哪里", "pinyin": "na3 li3", "english": "where", "level": "HSK1"}, {"hanzi": "今天", "pinyin": "jin1 tian1", "english": "today", "level": "HSK1"}, {"hanzi": "昨天", "pinyin": "zuo2 tian1", "english": "yesterday", "level": "HSK1"}, {"hanzi": "明天", "pinyin": "ming2 tian1", "english": "tomorrow", "level": "HSK1"}, {"hanzi": "现在", "pinyin": "xian4 zai4", "english": "now", "level": "HSK1"}, {"hanzi": "点", "pinyin": "dian3", "english": "o'clock", "level": "HSK1"}, {"hanzi": "分钟", "pinyin": "fen1 zhong1", "english": "minute", "level": "HSK1"}, {"hanzi": "晚上", "pinyin": "wan3 shang4", "english": "evening", "level": "HSK1"}, {"hanzi": "星期", "pinyin": "xing1 qi1", "english": "week", "level": "HSK1"}, {"hanzi": "名字", "pinyin": "ming2 zi", "english": "name", "level": "HSK1"}, {"hanzi": "朋友", "pinyin": "peng2 you", "english": "friend", "level": "HSK1"}, {"hanzi": "家", "pinyin": "jia1", "english": "home/family", "level": "HSK1"}, {"hanzi": "老师", "pinyin": "lao3 shi1", "english": "teacher", "level": "HSK1"}, {"hanzi": "学生", "pinyin": "xue2 sheng1", "english": "student", "level": "HSK1"}, {"hanzi": "医生", "pinyin": "yi1 sheng1", "english": "doctor", "level": "HSK1"}, {"hanzi": "喜欢", "pinyin": "xi3 huan1", "english": "to like", "level": "HSK1"}, {"hanzi": "想", "pinyin": "xiang3", "english": "to want / think", "level": "HSK1"}, {"hanzi": "会", "pinyin": "hui4", "english": "can / know how", "level": "HSK1"}, {"hanzi": "可以", "pinyin": "ke3 yi3", "english": "may / can", "level": "HSK1"}, {"hanzi": "去", "pinyin": "qu4", "english": "to go", "level": "HSK1"}, {"hanzi": "来", "pinyin": "lai2", "english": "to come", "level": "HSK1"}, {"hanzi": "住", "pinyin": "zhu4", "english": "to live", "level": "HSK1"}, {"hanzi": "走", "pinyin": "zou3", "english": "to walk", "level": "HSK1"}, {"hanzi": "看", "pinyin": "kan4", "english": "to look / read", "level": "HSK1"}, {"hanzi": "听", "pinyin": "ting1", "english": "to listen", "level": "HSK1"}, {"hanzi": "说话", "pinyin": "shuo1 hua4", "english": "to speak", "level": "HSK1"}, {"hanzi": "问", "pinyin": "wen4", "english": "to ask", "level": "HSK1"}, {"hanzi": "认识", "pinyin": "ren4 shi", "english": "to know (someone)", "level": "HSK1"}];
+var badge=document.getElementById('badge');var toast=document.getElementById('toast');
+document.getElementById('pyStyle').value=pyStyle;
+document.getElementById('startSide').value=startSide;
+document.getElementById('f1').checked = f1==='1'; document.getElementById('f2').checked = f2==='1';
 
 function showToast(msg){toast.textContent=msg;toast.style.display='block';setTimeout(function(){toast.style.display='none';},1200);}
 
@@ -152,18 +158,43 @@ function showToast(msg){toast.textContent=msg;toast.style.display='block';setTim
 })();
 
 function displayPinyin(p){ return (pyStyle==='numbers')? p : (window.pinyinToMarks? window.pinyinToMarks(p):p); }
-
 function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
-function buildQueue(size){ if(!Array.isArray(deck)||!deck.length){showToast('No deck loaded');return;} var idxs=deck.map(function(_,i){return i;}); shuffle(idxs); queue=idxs.slice(0,Math.min(size,idxs.length)); ptr=0; document.getElementById('queueCount').textContent=queue.length; updateBadge(); }
 function updateBadge(){ var total=deck?deck.length:0; var idx=(queue.length&&ptr<queue.length)?(ptr+1):'—'; badge.textContent='Deck: '+total+' • Card: '+idx+'/'+(queue.length||0); }
+function currentFilters(){ return {hsk1:document.getElementById('f1').checked, hsk2:document.getElementById('f2').checked}; }
+function applyFiltersToBase(){
+  var f=currentFilters();
+  var filtered = BASE.filter(function(r){
+    if(r.level==='HSK1' && f.hsk1) return true;
+    if(r.level==='HSK2' && f.hsk2) return true;
+    return false;
+  });
+  document.getElementById('countBadge').textContent = filtered.length + ' cards selected';
+  return filtered;
+}
+
+// Rendering rules
 function renderSides(card){
   var front='',back='',meta='';
-  if(mode==='hz2en'){ front=card.hanzi||card.pinyin||'—'; back=card.english||''; meta=displayPinyin(card.pinyin||''); }
-  if(mode==='en2hz'){ front=card.english||'—'; back=card.hanzi||card.pinyin||''; meta=displayPinyin(card.pinyin||''); }
-  if(mode==='hz2py'){ front=card.hanzi||'—'; back=displayPinyin(card.pinyin||''); meta=card.english; }
-  if(mode==='py2hz'){ front=displayPinyin(card.pinyin||'—'); back=card.hanzi||''; meta=card.english; }
-  return {front:front, back:back, meta:(card.level? card.level+' • ' : '') + (meta||'')};
+  var frontMode = (startSide==='mandarin') ? 'hz' : 'en';
+  if(frontMode==='hz'){
+    front = card.hanzi || card.pinyin || '—';
+    back  = card.english || '';
+    meta  = displayPinyin(card.pinyin||'');
+  }else{
+    front = card.english || '—';
+    back  = card.hanzi || card.pinyin || '';
+    meta  = ''; // hide hints if English is front
+  }
+  return {front:front, back:back, meta:meta};
 }
+
+function buildQueue(size){
+  if(!Array.isArray(deck)||!deck.length){showToast('No deck loaded');return;}
+  var idxs=deck.map(function(_,i){return i;}); shuffle(idxs);
+  queue=idxs.slice(0,Math.min(size,idxs.length)); ptr=0;
+  document.getElementById('queueCount').textContent=queue.length; updateBadge();
+}
+
 function showCard(){
   if(!queue.length){ frontEl.textContent='No cards in queue — press Start Session'; backEl.style.display='none'; metaEl.textContent=''; updateBadge(); return; }
   if(ptr>=queue.length){
@@ -175,31 +206,91 @@ function showCard(){
   var card=deck[queue[ptr]]; var r=renderSides(card);
   frontEl.textContent=r.front; backEl.textContent=r.back; backEl.style.display = flipped ? 'block':'none'; metaEl.textContent=r.meta; updateBadge();
 }
+
 function flip(){ flipped=!flipped; backEl.style.display = flipped ? 'block':'none'; }
 function next(){ if(ptr<queue.length-1){ ptr++; } else { ptr=queue.length; } flipped=false; showCard(); }
 function got(){ if(ptr>=queue.length) return; stats.seen++; stats.correct++; document.getElementById('seen').textContent=stats.seen; document.getElementById('correct').textContent=stats.correct; queue.splice(ptr,1); if(ptr>=queue.length) ptr=queue.length; document.getElementById('queueCount').textContent=queue.length; flipped=false; showCard(); }
 function miss(){ if(ptr>=queue.length) return; stats.seen++; stats.missed++; document.getElementById('seen').textContent=stats.seen; document.getElementById('missed').textContent=stats.missed; var cur=queue[ptr]; queue.splice(ptr,1); var re=Math.min(queue.length, ptr+5+Math.floor(Math.random()*3)); queue.splice(re,0,cur); document.getElementById('queueCount').textContent=queue.length; flipped=false; showCard(); }
 
-function __loadHSK(){ try { deck=PRELOADED.slice(); document.getElementById('queueCount').textContent='0'; stats={seen:0,correct:0,missed:0}; var s=parseInt(document.getElementById('sess').value,10); if(isNaN(s)) s=15; s=Math.max(5,Math.min(100,s)); buildQueue(s); flipped=false; showCard(); showToast('HSK deck loaded ('+deck.length+' words)'); } catch(e){ showToast('Load failed: '+(e.message||e)); } }
+function __loadHSK(){
+  try{
+    deck = applyFiltersToBase();
+    if(!deck.length){ showToast('No words match selected levels'); return; }
+    document.getElementById('queueCount').textContent='0'; stats={seen:0,correct:0,missed:0};
+    var s=parseInt(document.getElementById('sess').value,10); if(isNaN(s)) s=15;
+    s=Math.max(5,Math.min(100,s));
+    buildQueue(s); flipped=false; showCard();
+    showToast('Deck loaded ('+deck.length+' words)');
+  }catch(e){ showToast('Load failed: '+(e.message||e)); }
+}
 
 document.getElementById('loadHSK').addEventListener('click', __loadHSK, {passive:true});
-document.getElementById('start').addEventListener('click', function(){ if(!deck.length){ showToast('Load a deck first'); return; } stats={seen:0,correct:0,missed:0}; var s=parseInt(document.getElementById('sess').value,10); if(isNaN(s)) s=15; s=Math.max(5,Math.min(100,s)); localStorage.setItem('sessSize', String(s)); document.getElementById('sessLabel').textContent=s; buildQueue(s); flipped=false; showCard(); showToast('Session started ('+s+' cards)'); });
+document.getElementById('start').addEventListener('click', function(){
+  if(!deck.length){ showToast('Load a deck first'); return; }
+  stats={seen:0,correct:0,missed:0};
+  var s=parseInt(document.getElementById('sess').value,10); if(isNaN(s)) s=15; s=Math.max(5,Math.min(100,s));
+  localStorage.setItem('sessSize', String(s)); document.getElementById('sessLabel').textContent=s;
+  buildQueue(s); flipped=false; showCard(); showToast('Session started ('+s+' cards)');
+});
 document.getElementById('btnFlip').addEventListener('click', flip);
 document.getElementById('btnNext').addEventListener('click', next);
 document.getElementById('btnGot').addEventListener('click', got);
 document.getElementById('btnMiss').addEventListener('click', miss);
-document.getElementById('mode').addEventListener('change', function(e){ mode=e.target.value; localStorage.setItem('mode',mode); var labels={'hz2en':'Hanzi → English','en2hz':'English → Hanzi','hz2py':'Hanzi → Pinyin','py2hz':'Pinyin → Hanzi'}; document.getElementById('modeLabel').textContent = labels[mode]; flipped=false; showCard(); });
-document.getElementById('pyStyle').addEventListener('change', function(e){ pyStyle=e.target.value; localStorage.setItem('pyStyle', pyStyle); showCard(); });
-document.getElementById('file').addEventListener('change', function(e){ var f=e.target.files[0]; if(!f) return; f.text().then(function(text){ var parsed=parseFile(text); if(!parsed.length){ showToast('Could not parse any rows'); return; } deck=parsed; stats={seen:0,correct:0,missed:0}; showToast('Imported '+deck.length+' cards'); document.getElementById('queueCount').textContent='0'; updateBadge(); }); });
-document.getElementById('usePasted').addEventListener('click', function(){ var text=document.getElementById('paste').value.trim(); if(!text) return showToast('Paste CSV/TSV first'); var parsed=parseFile(text); if(!parsed.length) return showToast('No rows parsed; check headers'); deck=parsed; stats={seen:0,correct:0,missed:0}; document.getElementById('queueCount').textContent='0'; showToast('Loaded pasted deck ('+deck.length+')'); updateBadge(); });
+
+document.getElementById('pyStyle').addEventListener('change', function(e){ localStorage.setItem('pyStyle', e.target.value); pyStyle=e.target.value; showCard(); });
+document.getElementById('startSide').addEventListener('change', function(e){ localStorage.setItem('startSide', e.target.value); startSide=e.target.value; flipped=false; showCard(); });
+
+document.getElementById('file').addEventListener('change', function(e){
+  var f=e.target.files[0]; if(!f) return;
+  f.text().then(function(text){
+    var parsed=parseFile(text);
+    if(!parsed.length){ showToast('Could not parse any rows'); return; }
+    deck=parsed; stats={seen:0,correct:0,missed:0}; showToast('Imported '+deck.length+' cards'); document.getElementById('queueCount').textContent='0'; updateBadge();
+  });
+});
+document.getElementById('usePasted').addEventListener('click', function(){
+  var text=document.getElementById('paste').value.trim(); if(!text) return showToast('Paste CSV/TSV first');
+  var parsed=parseFile(text); if(!parsed.length) return showToast('No rows parsed; check headers');
+  deck=parsed; stats={seen:0,correct:0,missed:0}; document.getElementById('queueCount').textContent='0'; showToast('Loaded pasted deck ('+deck.length+')'); updateBadge();
+});
 document.getElementById('clearPasted').addEventListener('click', function(){ document.getElementById('paste').value=''; });
+
+document.getElementById('f1').addEventListener('change', function(e){ localStorage.setItem('filterHSK1', e.target.checked?'1':'0'); deck = applyFiltersToBase(); updateBadge(); showCard(); });
+document.getElementById('f2').addEventListener('change', function(e){ localStorage.setItem('filterHSK2', e.target.checked?'1':'0'); deck = applyFiltersToBase(); updateBadge(); showCard(); });
+
 document.getElementById('btnReset').addEventListener('click', function(){ if('serviceWorker' in navigator){ navigator.serviceWorker.getRegistrations().then(function(regs){ regs.forEach(function(r){ r.unregister(); }); location.reload(true); }); } else location.reload(true); });
 document.addEventListener('keydown', function(e){ if(e.repeat) return; var k=e.key.toLowerCase(); if(k==='f') flip(); else if(k==='g') got(); else if(k==='m') miss(); else if(k==='n'||k===' ') { next(); e.preventDefault(); } });
 
-function parseFile(text){ var delim=text.indexOf('\t')>-1?'\t':','; var lines=text.split(/\r?\n/).filter(function(l){return l.trim().length>0;}); if(!lines.length) return []; var headers=lines[0].split(delim).map(function(h){return h.trim().toLowerCase();}); var idx={hanzi:headers.indexOf('hanzi'),pinyin:headers.indexOf('pinyin'),english:headers.indexOf('english'),level:headers.indexOf('level')}; if(idx.hanzi<0 && idx.english<0 && idx.pinyin<0) return []; var out=[],i; for(i=1;i<lines.length;i++){ var cols=smartSplit(lines[i],delim); out.push({ hanzi: idx.hanzi>=0 ? (cols[idx.hanzi]||'').trim() : '', pinyin: idx.pinyin>=0 ? (cols[idx.pinyin]||'').trim() : '', english: idx.english>=0 ? (cols[idx.english]||'').trim() : '', level: idx.level>=0 ? (cols[idx.level]||'').trim() : '' }); } return out.filter(function(r){ return r.hanzi||r.english||r.pinyin; }); }
-function smartSplit(line,delim){ var out=[],cur='',inQ=false,i,ch,nxt; for(i=0;i<line.length;i++){ ch=line[i]; nxt=line[i+1]; if(ch==='"'){ if(inQ && nxt==='"'){ cur+='"'; i++; } else { inQ=!inQ; } } else if(ch===delim && !inQ){ out.push(cur); cur=''; } else cur+=ch; } out.push(cur); return out; }
+function parseFile(text){
+  var delim=text.indexOf('\t')>-1?'\t':',';
+  var lines=text.split(/\r?\n/).filter(function(l){return l.trim().length>0;});
+  if(!lines.length) return [];
+  var headers=lines[0].split(delim).map(function(h){return h.trim().toLowerCase();});
+  var idx={hanzi:headers.indexOf('hanzi'),pinyin:headers.indexOf('pinyin'),english:headers.indexOf('english'),level:headers.indexOf('level')};
+  if(idx.hanzi<0 && idx.english<0 && idx.pinyin<0) return [];
+  var out=[], i;
+  for(i=1;i<lines.length;i++){
+    var cols=smartSplit(lines[i], delim);
+    out.push({ hanzi: idx.hanzi>=0?(cols[idx.hanzi]||'').trim(): '',
+               pinyin: idx.pinyin>=0?(cols[idx.pinyin]||'').trim(): '',
+               english: idx.english>=0?(cols[idx.english]||'').trim(): '',
+               level: idx.level>=0?(cols[idx.level]||'').trim(): '' });
+  }
+  return out.filter(function(r){ return r.hanzi||r.english||r.pinyin; });
+}
+function smartSplit(line,delim){
+  var out=[], cur='', inQ=false, i, ch, nxt;
+  for(i=0;i<line.length;i++){
+    ch=line[i]; nxt=line[i+1];
+    if(ch==='"'){
+      if(inQ && nxt==='"'){ cur+='"'; i++; } else { inQ=!inQ; }
+    } else if(ch===delim && !inQ){ out.push(cur); cur=''; }
+    else cur+=ch;
+  }
+  out.push(cur); return out;
+}
 
-window.addEventListener('load', function(){ setTimeout(function(){ if(!deck.length){ __loadHSK(); } }, 200); });
-document.getElementById('mode').value=mode; document.getElementById('sess').value=sessSize; document.getElementById('sessLabel').textContent=sessSize; updateBadge();
+window.addEventListener('load', function(){ setTimeout(function(){ deck = applyFiltersToBase(); updateBadge(); showCard(); }, 200); });
+document.getElementById('sess').value=sessSize; document.getElementById('sessLabel').textContent=sessSize;
 </script>
 </body></html>
