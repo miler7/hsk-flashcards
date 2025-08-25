@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
@@ -172,20 +171,18 @@ function applyFiltersToBase(){
   return filtered;
 }
 
-// Rendering rules
+// Renders front/back content; meta (pinyin) managed in showCard to obey "hide on English side".
 function renderSides(card){
-  var front='',back='',meta='';
+  var front='',back='';
   var frontMode = (startSide==='mandarin') ? 'hz' : 'en';
   if(frontMode==='hz'){
     front = card.hanzi || card.pinyin || '—';
     back  = card.english || '';
-    meta  = displayPinyin(card.pinyin||'');
   }else{
     front = card.english || '—';
     back  = card.hanzi || card.pinyin || '';
-    meta  = ''; // hide hints if English is front
   }
-  return {front:front, back:back, meta:meta};
+  return {front:front, back:back};
 }
 
 function buildQueue(size){
@@ -201,13 +198,23 @@ function showCard(){
     frontEl.innerHTML='Session complete 🎉';
     backEl.style.display='block';
     backEl.innerHTML='<span style="color:#22c55e">Correct: '+stats.correct+'</span> • <span style="color:#f87171">Missed: '+stats.missed+'</span>';
-    metaEl.textContent='Tap Start Session to go again'; updateBadge(); return;
+    metaEl.textContent=''; updateBadge(); return;
   }
   var card=deck[queue[ptr]]; var r=renderSides(card);
-  frontEl.textContent=r.front; backEl.textContent=r.back; backEl.style.display = flipped ? 'block':'none'; metaEl.textContent=r.meta; updateBadge();
+  var englishVisible = (startSide==='mandarin' ? flipped : !flipped);
+  frontEl.textContent=r.front; 
+  backEl.textContent=r.back; 
+  backEl.style.display = flipped ? 'block':'none';
+  // Only show pinyin when Mandarin (Hanzi) is visible:
+  if(englishVisible){
+    metaEl.textContent='';
+  }else{
+    metaEl.textContent = displayPinyin(card.pinyin||'');
+  }
+  updateBadge();
 }
 
-function flip(){ flipped=!flipped; backEl.style.display = flipped ? 'block':'none'; }
+function flip(){ flipped=!flipped; showCard(); }
 function next(){ if(ptr<queue.length-1){ ptr++; } else { ptr=queue.length; } flipped=false; showCard(); }
 function got(){ if(ptr>=queue.length) return; stats.seen++; stats.correct++; document.getElementById('seen').textContent=stats.seen; document.getElementById('correct').textContent=stats.correct; queue.splice(ptr,1); if(ptr>=queue.length) ptr=queue.length; document.getElementById('queueCount').textContent=queue.length; flipped=false; showCard(); }
 function miss(){ if(ptr>=queue.length) return; stats.seen++; stats.missed++; document.getElementById('seen').textContent=stats.seen; document.getElementById('missed').textContent=stats.missed; var cur=queue[ptr]; queue.splice(ptr,1); var re=Math.min(queue.length, ptr+5+Math.floor(Math.random()*3)); queue.splice(re,0,cur); document.getElementById('queueCount').textContent=queue.length; flipped=false; showCard(); }
@@ -245,13 +252,13 @@ document.getElementById('file').addEventListener('change', function(e){
   f.text().then(function(text){
     var parsed=parseFile(text);
     if(!parsed.length){ showToast('Could not parse any rows'); return; }
-    deck=parsed; stats={seen:0,correct:0,missed:0}; showToast('Imported '+deck.length+' cards'); document.getElementById('queueCount').textContent='0'; updateBadge();
+    deck=parsed; stats={seen:0,correct:0,missed:0}; showToast('Imported '+deck.length+' cards'); document.getElementById('queueCount').textContent='0'; updateBadge(); showCard();
   });
 });
 document.getElementById('usePasted').addEventListener('click', function(){
   var text=document.getElementById('paste').value.trim(); if(!text) return showToast('Paste CSV/TSV first');
   var parsed=parseFile(text); if(!parsed.length) return showToast('No rows parsed; check headers');
-  deck=parsed; stats={seen:0,correct:0,missed:0}; document.getElementById('queueCount').textContent='0'; showToast('Loaded pasted deck ('+deck.length+')'); updateBadge();
+  deck=parsed; stats={seen:0,correct:0,missed:0}; document.getElementById('queueCount').textContent='0'; showToast('Loaded pasted deck ('+deck.length+')'); updateBadge(); showCard();
 });
 document.getElementById('clearPasted').addEventListener('click', function(){ document.getElementById('paste').value=''; });
 
