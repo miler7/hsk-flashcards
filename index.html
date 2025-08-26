@@ -63,7 +63,20 @@ async function loadDeck(which) {
 
 
 
-function setStartSide(side) { startSide = side; flipped = false; showCard(); }
+function setStartSide(side) {
+  startSide = side;
+  flipped = false;
+  
+  // Reset to first card only if deck is loaded
+  if (deck.length > 0) {
+    current = 0; // optional: restart from first card
+    showCard();
+    document.getElementById('flashcard').classList.remove('hidden');
+    document.getElementById('nextBtn').classList.remove('hidden');
+  } else {
+    alert("Please load a deck first!");
+  }
+}
 
 function shuffle(array) {
   for (let i = array.length - 1; i > 0; i--) {
