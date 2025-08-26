@@ -46,18 +46,22 @@ async function loadJSON(path) {
 }
 
 async function loadDeck(which) {
-  let hsk1 = await loadJSON('decks/hsk1.json');
-  let hsk2 = await loadJSON('decks/hsk2.json');
-  if (which === 'hsk1') deck = [...hsk1];
-  else if (which === 'hsk2') deck = [...hsk2];
-  else deck = [...hsk1, ...hsk2];
+  let deck;
+  if (which === 'hsk1') {
+    deck = await fetch('decks/hsk1.json').then(r => r.json());
+  } else if (which === 'hsk2') {
+    deck = await fetch('decks/hsk2.json').then(r => r.json());
+  } else {
+    let hsk1 = await fetch('decks/hsk1.json').then(r => r.json());
+    let hsk2 = await fetch('decks/hsk2.json').then(r => r.json());
+    deck = [...hsk1, ...hsk2];
+  }
   shuffle(deck);
   current = 0;
   flipped = false;
-  document.getElementById('flashcard').classList.remove('hidden');
-  document.getElementById('nextBtn').classList.remove('hidden');
   showCard();
 }
+
 
 function setStartSide(side) { startSide = side; flipped = false; showCard(); }
 
