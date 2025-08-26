@@ -1,0 +1,52 @@
+[
+  {
+    "chinese": "我",
+    "pinyin": "wǒ",
+    "english": "I; me"
+  },
+  {
+    "chinese": "你",
+    "pinyin": "nǐ",
+    "english": "you"
+  },
+  {
+    "chinese": "他",
+    "pinyin": "tā",
+    "english": "he; him"
+  },
+  {
+    "chinese": "她",
+    "pinyin": "tā",
+    "english": "she; her"
+  },
+  {
+    "chinese": "不",
+    "pinyin": "bù",
+    "english": "not; no"
+  },
+  {
+    "chinese": "要",
+    "pinyin": "yào",
+    "english": "want; need"
+  },
+  {
+    "chinese": "不要",
+    "pinyin": "bú yào",
+    "english": "don’t want"
+  },
+  {
+    "chinese": "有",
+    "pinyin": "yǒu",
+    "english": "have"
+  },
+  {
+    "chinese": "没有",
+    "pinyin": "méi yǒu",
+    "english": "don’t have"
+  },
+  {
+    "chinese": "喜欢",
+    "pinyin": "xǐ huan",
+    "english": "like"
+  }
+]

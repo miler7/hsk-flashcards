@@ -2,105 +2,93 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HSK Flashcards</title>
-  <style>
-    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
-    button { margin: 5px; padding: 10px 20px; font-size: 16px; }
-    .flashcard { border: 1px solid #ccc; border-radius: 12px; padding: 40px; margin: 20px auto;
-                 max-width: 400px; min-height: 200px; display: flex; flex-direction: column;
-                 justify-content: center; align-items: center; font-size: 24px; }
-    .chinese { font-size: 64px; margin: 10px 0; }
-    .pinyin { font-size: 36px; margin: 10px 0; }
-    .english { font-size: 18px; margin: 10px 0; }
-    .hidden { display: none; }
-    #progress { margin-top: 10px; font-size: 16px; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HSK Flashcards v31</title>
+<style>
+body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+button { margin: 5px; padding: 10px 20px; font-size: 16px; }
+.flashcard { border: 1px solid #ccc; border-radius: 12px; padding: 40px; margin: 20px auto;
+             max-width: 400px; min-height: 200px; display: flex; flex-direction: column;
+             justify-content: center; align-items: center; font-size: 24px; cursor: pointer; }
+.chinese { font-size: 64px; margin: 10px 0; }
+.pinyin { font-size: 36px; margin: 10px 0; }
+.english { font-size: 18px; margin: 10px 0; }
+.hidden { display: none; }
+#progress { margin-top: 10px; font-size: 16px; }
+</style>
 </head>
 <body>
-  <h1>HSK 1–2 Flashcards</h1>
+<h1>HSK 1–2 Flashcards</h1>
+<div>
   <button onclick="loadDeck('hsk1')">Load HSK 1</button>
   <button onclick="loadDeck('hsk2')">Load HSK 2</button>
   <button onclick="loadDeck('both')">Load HSK 1+2</button>
-  <div>
-    <button onclick="setStartSide('mandarin')">Mandarin Start</button>
-    <button onclick="setStartSide('english')">English Start</button>
-  </div>
-  <div class="flashcard hidden" id="flashcard" onclick="flipCard()">
-    <div id="cardContent"></div>
-  </div>
-  <button id="nextBtn" class="hidden" onclick="nextCard()">Next</button>
-  <div id="progress"></div>
-
+</div>
+<div>
+  <button onclick="setStartSide('mandarin')">Mandarin Start</button>
+  <button onclick="setStartSide('english')">English Start</button>
+</div>
+<div class="flashcard hidden" id="flashcard" onclick="flipCard()">
+  <div id="cardContent"></div>
+</div>
+<button id="nextBtn" class="hidden" onclick="nextCard()">Next</button>
+<div id="progress"></div>
 <script>
-let hsk1 = [
-  {ch:"你", py:"nǐ", en:"you"},
-  {ch:"好", py:"hǎo", en:"good"},
-  {ch:"不要", py:"bú yào", en:"don’t want"}
-];
-let hsk2 = [
-  {ch:"时间", py:"shíjiān", en:"time"},
-  {ch:"希望", py:"xīwàng", en:"to hope"},
-  {ch:"问题", py:"wèntí", en:"question"}
-];
 let deck = [];
 let current = 0;
 let flipped = false;
-let startSide = "mandarin";
+let startSide = 'mandarin';
 
-function loadDeck(which) {
-  if (which === "hsk1") deck = [...hsk1];
-  else if (which === "hsk2") deck = [...hsk2];
+async function loadJSON(path) {
+  const resp = await fetch(path);
+  return await resp.json();
+}
+
+async function loadDeck(which) {
+  let hsk1 = await loadJSON('decks/hsk1.json');
+  let hsk2 = await loadJSON('decks/hsk2.json');
+  if (which === 'hsk1') deck = [...hsk1];
+  else if (which === 'hsk2') deck = [...hsk2];
   else deck = [...hsk1, ...hsk2];
+  shuffle(deck);
   current = 0;
   flipped = false;
-  document.getElementById("flashcard").classList.remove("hidden");
-  document.getElementById("nextBtn").classList.remove("hidden");
+  document.getElementById('flashcard').classList.remove('hidden');
+  document.getElementById('nextBtn').classList.remove('hidden');
   showCard();
 }
 
-function setStartSide(side) {
-  startSide = side;
-  flipped = false;
-  showCard();
+function setStartSide(side) { startSide = side; flipped = false; showCard(); }
+
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
 }
 
 function showCard() {
   if (current >= deck.length) {
-    document.getElementById("cardContent").innerHTML = "Deck finished!";
-    document.getElementById("progress").innerText = "";
+    document.getElementById('cardContent').innerHTML = 'Deck finished!';
+    document.getElementById('progress').innerText = '';
     return;
   }
   let card = deck[current];
-  let html = "";
+  let html = '';
   if (!flipped) {
-    if (startSide === "mandarin") {
-      html = `<div class="chinese">${card.ch}</div><div class="pinyin">${card.py}</div>`;
-    } else {
-      html = `<div class="english" style="font-size:20px">${card.en}</div>`;
-    }
+    if (startSide === 'mandarin') html = `<div class="chinese">${card.chinese}</div><div class="pinyin">${card.pinyin}</div>`;
+    else html = `<div class="english" style="font-size:20px">${card.english}</div>`;
   } else {
-    if (startSide === "mandarin") {
-      html = `<div class="english">${card.en}</div><div class="chinese" style="font-size:32px">${card.ch}</div>`;
-    } else {
-      html = `<div class="chinese" style="font-size:96px">${card.ch}</div><div class="pinyin" style="font-size:36px">${card.py}</div><div class="english" style="font-size:14px">${card.en}</div>`;
-    }
+    if (startSide === 'mandarin') html = `<div class="english">${card.english}</div><div class="chinese" style="font-size:32px">${card.chinese}</div>`;
+    else html = `<div class="chinese" style="font-size:96px">${card.chinese}</div><div class="pinyin" style="font-size:36px">${card.pinyin}</div><div class="english" style="font-size:14px">${card.english}</div>`;
   }
-  document.getElementById("cardContent").innerHTML = html;
-  document.getElementById("progress").innerText = `Card ${current+1} / ${deck.length}`;
+  document.getElementById('cardContent').innerHTML = html;
+  document.getElementById('progress').innerText = `Card ${current+1} / ${deck.length}`;
 }
 
-function flipCard() {
-  flipped = !flipped;
-  showCard();
-}
-
-function nextCard() {
-  current++;
-  flipped = false;
-  showCard();
-}
+function flipCard() { flipped = !flipped; showCard(); }
+function nextCard() { current++; flipped = false; showCard(); }
 </script>
 </body>
 </html>
