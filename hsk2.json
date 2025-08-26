@@ -1,0 +1,52 @@
+[
+  {
+    "chinese": "跑步",
+    "pinyin": "pǎo bù",
+    "english": "to run"
+  },
+  {
+    "chinese": "踢足球",
+    "pinyin": "tī zú qiú",
+    "english": "to play football (soccer)"
+  },
+  {
+    "chinese": "游泳",
+    "pinyin": "yóu yǒng",
+    "english": "to swim"
+  },
+  {
+    "chinese": "公共汽车",
+    "pinyin": "gōng gòng qì chē",
+    "english": "bus"
+  },
+  {
+    "chinese": "火车站",
+    "pinyin": "huǒ chē zhàn",
+    "english": "train station"
+  },
+  {
+    "chinese": "牛奶",
+    "pinyin": "niú nǎi",
+    "english": "milk"
+  },
+  {
+    "chinese": "鸡蛋",
+    "pinyin": "jī dàn",
+    "english": "egg"
+  },
+  {
+    "chinese": "颜色",
+    "pinyin": "yán sè",
+    "english": "color"
+  },
+  {
+    "chinese": "红色",
+    "pinyin": "hóng sè",
+    "english": "red"
+  },
+  {
+    "chinese": "蓝色",
+    "pinyin": "lán sè",
+    "english": "blue"
+  }
+]
