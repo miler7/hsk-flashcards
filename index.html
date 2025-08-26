@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HSK Flashcards v31</title>
+<title>HSK Flashcards v32</title>
 <style>
 body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
 button { margin: 5px; padding: 10px 20px; font-size: 16px; }
@@ -34,17 +33,22 @@ button { margin: 5px; padding: 10px 20px; font-size: 16px; }
 </div>
 <button id="nextBtn" class="hidden" onclick="nextCard()">Next</button>
 <div id="progress"></div>
+
 <script>
 let deck = [];
 let current = 0;
 let flipped = false;
 let startSide = 'mandarin';
 
-async function loadJSON(path) {
-  const resp = await fetch(path);
-  return await resp.json();
+// Shuffle helper
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
 }
 
+// Load JSON deck
 async function loadDeck(which) {
   if (which === 'hsk1') {
     deck = await fetch('decks/hsk1.json').then(r => r.json());
@@ -55,19 +59,21 @@ async function loadDeck(which) {
     let hsk2 = await fetch('decks/hsk2.json').then(r => r.json());
     deck = [...hsk1, ...hsk2];
   }
+
   shuffle(deck);
   current = 0;
   flipped = false;
+
+  // Show first card and unhide flashcard & next button
+  document.getElementById('flashcard').classList.remove('hidden');
+  document.getElementById('nextBtn').classList.remove('hidden');
   showCard();
 }
 
-
-
+// Set which side to start
 function setStartSide(side) {
   startSide = side;
   flipped = false;
-  
-  // Reset to first card only if deck is loaded
   if (deck.length > 0) {
     current = 0; // optional: restart from first card
     showCard();
@@ -78,34 +84,41 @@ function setStartSide(side) {
   }
 }
 
-function shuffle(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-}
-
+// Show current card
 function showCard() {
   if (current >= deck.length) {
     document.getElementById('cardContent').innerHTML = 'Deck finished!';
     document.getElementById('progress').innerText = '';
     return;
   }
+
   let card = deck[current];
   let html = '';
+
   if (!flipped) {
-    if (startSide === 'mandarin') html = `<div class="chinese">${card.chinese}</div><div class="pinyin">${card.pinyin}</div>`;
-    else html = `<div class="english" style="font-size:20px">${card.english}</div>`;
+    if (startSide === 'mandarin') {
+      html = `<div class="chinese">${card.chinese}</div><div class="pinyin">${card.pinyin}</div>`;
+    } else {
+      html = `<div class="english" style="font-size:14px">${card.english}</div>`;
+    }
   } else {
-    if (startSide === 'mandarin') html = `<div class="english">${card.english}</div><div class="chinese" style="font-size:32px">${card.chinese}</div>`;
-    else html = `<div class="chinese" style="font-size:96px">${card.chinese}</div><div class="pinyin" style="font-size:36px">${card.pinyin}</div><div class="english" style="font-size:14px">${card.english}</div>`;
+    if (startSide === 'mandarin') {
+      html = `<div class="english">${card.english}</div><div class="chinese" style="font-size:32px">${card.chinese}</div>`;
+    } else {
+      html = `<div class="chinese" style="font-size:96px">${card.chinese}</div>
+              <div class="pinyin" style="font-size:36px">${card.pinyin}</div>
+              <div class="english" style="font-size:14px">${card.english}</div>`;
+    }
   }
+
   document.getElementById('cardContent').innerHTML = html;
-  document.getElementById('progress').innerText = `Card ${current+1} / ${deck.length}`;
+  document.getElementById('progress').innerText = `Card ${current + 1} / ${deck.length}`;
 }
 
+// Flip and next card
 function flipCard() { flipped = !flipped; showCard(); }
 function nextCard() { current++; flipped = false; showCard(); }
+
 </script>
 </body>
 </html>
