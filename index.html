@@ -46,7 +46,6 @@ async function loadJSON(path) {
 }
 
 async function loadDeck(which) {
-  let deck;
   if (which === 'hsk1') {
     deck = await fetch('decks/hsk1.json').then(r => r.json());
   } else if (which === 'hsk2') {
@@ -61,6 +60,7 @@ async function loadDeck(which) {
   flipped = false;
   showCard();
 }
+
 
 
 function setStartSide(side) { startSide = side; flipped = false; showCard(); }
