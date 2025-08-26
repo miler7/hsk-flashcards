@@ -1,15 +1,16 @@
+
 {
-  "name": "HSK 1–2 Flashcards",
+  "name": "HSK Flashcards v2.9",
   "short_name": "HSK Cards",
-  "start_url": ".",
+  "start_url": "./index.html",
   "display": "standalone",
+  "background_color": "#ffffff",
+  "description": "HSK 1-2 Flashcards App",
   "icons": [
     {
       "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
-  ],
-  "background_color": "#0f172a",
-  "theme_color": "#0f172a"
+  ]
 }
